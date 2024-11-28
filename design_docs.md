@@ -1,20 +1,26 @@
 # Return visits
 
 As Jehovah's witnesses we want to track who we visit and when to make the return
-visits easier. People information is sensible data, so it shouldn't leave the
-device where it was saved at least in network events like cloud backups.
+visits. People information is sensible data, so it shouldn't leave the device
+where it was saved at least in network events like cloud backups.
 
 ## Use cases
 
 ### The publisher wants to see the information of the people
 
 Filter and sort the information.
+Filter by some fields like, colony.
 See the nearest people with device location.
 
 ### The publisher wants to update the information of the people
 
 When she updates the information a new entry should be added, to let she know
 that something changed, it must be slightly different to common entries.
+
+## The publisher wants to add another person with same location
+
+When there's another person who answers the door, we want to save as a new
+person record, but with the same location.
 
 ### The publisher wants to add new interested people
 
@@ -62,14 +68,29 @@ structure:
 ```
 Person
 {
-	id: uuid
+	id: number
 	name: string
 	location: GeolocationPosition
 	description: string
-	returnVisits: {
-		date: date
-		topic: string
-		notes: string
-	}[]
+	returnDay: number
+	colony: string
+}
+
+ReturnVisit
+{
+	person_id: number
+	date: date
+	topic: string
+	notes: string
 }
 ```
+
+#### People object
+
+keyPath: id, autoincrementing
+
+returnDay is the day of the week where you should return to visit the person.
+
+#### Return Visits object
+
+keyPath: [person_id, date]
