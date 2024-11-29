@@ -1,11 +1,23 @@
+import { computed, MaybeRef, unref, UnwrapRef } from "vue"
 import { UseQueryOptions } from "@tanstack/vue-query"
 import { peopleKeys } from "./peopleKeys"
 import { getAllFromStore, PEOPLE_STORE } from "../../db/useDatabase"
 import { Person } from "../../db/models/Person"
 
-export function peopleQuery(): UseQueryOptions<Person[]> {
-	return {
+type QueryOptions = UseQueryOptions<
+	Person[],
+	Error,
+	Person[],
+	Person[],
+	ReturnType<typeof peopleKeys.all>
+>
+
+export function peopleQuery(
+	options: MaybeRef<Omit<UnwrapRef<QueryOptions>, "queryKey" | "queryFn">> = {}
+): QueryOptions {
+	return computed(() => ({
+		...unref(options),
 		queryKey: peopleKeys.all(),
 		queryFn: () => getAllFromStore<Person>(PEOPLE_STORE),
-	}
+	}))
 }

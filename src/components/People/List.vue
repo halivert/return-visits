@@ -1,21 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import { usePeopleQuery } from "../../queries/people/usePeople"
+import { DAYS } from "../../constants"
 
 const peopleQuery = usePeopleQuery()
 
-const DAYS = [
-	"domingo",
-	"lunes",
-	"martes",
-	"miércoles",
-	"jueves",
-	"viernes",
-	"sábado",
-] as const
-
 const selectedDays = ref<number[]>([])
 const selectedColonies = ref<string[]>([])
+
+const showFilters = computed(() => {
+	if (!peopleQuery.data.value?.length) return false
+
+	return peopleQuery.data.value.length > 1
+})
 
 const days = computed(
 	() => new Set(peopleQuery.data.value?.map(({ returnDay }) => returnDay))
@@ -48,7 +45,7 @@ function resetForm() {
 
 <template>
 	<div class="space-y-4">
-		<form @reset="resetForm" class="space-y-2">
+		<form @reset="resetForm" class="space-y-2" v-if="showFilters">
 			<div class="grid grid-cols-5 gap-3">
 				<label class="flex flex-col gap-1 col-span-3">
 					Colonia

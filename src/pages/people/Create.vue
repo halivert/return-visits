@@ -4,16 +4,7 @@ import { useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
 import { usePeopleQuery } from "../../queries/people/usePeople"
 import { useAddPeople } from "../../queries/people/useAddPeople"
-
-const DAYS = [
-	"domingo",
-	"lunes",
-	"martes",
-	"miércoles",
-	"jueves",
-	"viernes",
-	"sábado",
-] as const
+import { DAYS } from "../../constants"
 
 const todayDay = computed(() => new Date().getDay())
 

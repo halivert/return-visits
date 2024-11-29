@@ -66,6 +66,9 @@ export async function addToStore<TData, TKey extends IDBValidKey = IDBValidKey>(
 ): Promise<TKey> {
 	return new Promise(async (resolve, reject) => {
 		try {
+			if (import.meta.env.DEV) {
+				console.log(`Adding to ${store}`, { value })
+			}
 			const dbStore = await getStore(store, "readwrite")
 
 			const request = dbStore.add(value)
@@ -91,6 +94,9 @@ export async function getFromStore<TData>(
 ): Promise<TData> {
 	return new Promise(async (resolve, reject) => {
 		try {
+			if (import.meta.env.DEV) {
+				console.log(`Querying ${query} from ${store}`)
+			}
 			const dbStore = await getStore(store, "readonly")
 
 			const request = dbStore.get(query)
@@ -119,6 +125,9 @@ export async function getAllFromStore<TData>(
 ): Promise<TData[]> {
 	return new Promise(async (resolve, reject) => {
 		try {
+			if (import.meta.env.DEV) {
+				console.log(`Querying all from from ${store}`, { query, count })
+			}
 			const dbStore = await getStore(store, "readonly")
 
 			const request = dbStore.getAll(query, count)
