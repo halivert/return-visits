@@ -7,7 +7,7 @@ export const router = createRouter({
 	routes: [
 		{
 			path: "/",
-			component: () => App,
+			component: App,
 			children: [
 				{
 					path: "/",
