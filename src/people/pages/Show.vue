@@ -16,8 +16,8 @@ export default {
 import { computed } from "vue"
 import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router"
 import { useTitle } from "@vueuse/core"
-import { usePerson } from "../../queries/people/usePerson"
-import { useAsyncPerson } from "../../queries/people/useAsyncPerson"
+import { usePerson } from "../queries/usePerson"
+import { useAsyncPerson } from "../queries/useAsyncPerson"
 import { DAYS } from "../../constants"
 
 const router = useRouter()
@@ -88,6 +88,25 @@ useTitle(
 			<p>
 				{{ person.description }}
 			</p>
+
+			<hr class="h-0.5 bg-asparagus-600 my-3" />
+
+			<section class="px-2 py-1">
+				<div class="flex justify-between">
+					<h2 class="text-xl font-semibold">Revisitas</h2>
+
+					<router-link
+						:to="{
+							name: 'PeopleReturnVisitsCreate',
+						}"
+						class="underline bg-lemon-100"
+					>
+						Agregar revisita
+					</router-link>
+				</div>
+
+				<router-view />
+			</section>
 		</template>
 	</main>
 </template>

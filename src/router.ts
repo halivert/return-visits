@@ -18,7 +18,7 @@ export const router = createRouter({
 				{
 					path: "create",
 					name: "PeopleCreate",
-					component: () => import("../src/pages/people/Create.vue"),
+					component: () => import("../src/people/pages/Create.vue"),
 					meta: {
 						title: `Agregar persona | ${appName}`,
 					},
@@ -26,10 +26,22 @@ export const router = createRouter({
 				{
 					path: ":id",
 					name: "PeopleShow",
-					component: () => import("../src/pages/people/Show.vue"),
+					component: () => import("../src/people/pages/Show.vue"),
 					props: (to) => ({
 						id: parseInt(to.params.id as string, 10),
 					}),
+					children: [
+						{
+							path: "",
+							name: "PeopleReturnVisitsIndex",
+							component: () => import("../src/pages/NotFound.vue"),
+						},
+						{
+							path: "return-visits/create",
+							name: "PeopleReturnVisitsCreate",
+							component: () => import("../src/pages/NotFound.vue"),
+						},
+					],
 				},
 			],
 		},
