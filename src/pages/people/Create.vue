@@ -104,7 +104,7 @@ function handleSubmit(event: Event) {
 					id="name"
 					:class="[
 						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8',
+						'h-8 w-full',
 						errors['name']
 							? 'border-chili-400 accent-chili-600'
 							: 'border-asparagus-100 accent-asparagus-600',
@@ -127,7 +127,7 @@ function handleSubmit(event: Event) {
 					id="colony"
 					:class="[
 						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8',
+						'h-8 w-full',
 						errors['colony']
 							? 'border-chili-400 accent-chili-600'
 							: 'border-asparagus-100 accent-asparagus-600',
