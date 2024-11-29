@@ -49,28 +49,28 @@ function resetForm() {
 <template>
 	<div class="space-y-4">
 		<form @reset="resetForm" class="space-y-2">
-			<div class="grid grid-cols-2 gap-3">
-				<label class="flex flex-col gap-1">
+			<div class="grid grid-cols-5 gap-3">
+				<label class="flex flex-col gap-1 col-span-3">
 					Colonia
 
 					<select
-						class="dark:text-lemon-50"
+						class="block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border w-full text-base"
 						name="selectedColonies"
 						v-model="selectedColonies"
 						multiple
 						size="2"
 					>
-						<option v-for="colony in colonies" :key="colony">
+						<option v-for="colony in colonies" :key="colony" class="truncate">
 							{{ colony }}
 						</option>
 					</select>
 				</label>
 
-				<label class="flex flex-col gap-1">
+				<label class="flex flex-col gap-1 col-span-2">
 					Día de vuelta
 
 					<select
-						class="dark:text-lemon-50"
+						class="block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border w-full text-base"
 						name="selectedDays"
 						v-model="selectedDays"
 						multiple
@@ -78,7 +78,7 @@ function resetForm() {
 					>
 						<option
 							v-for="day in days"
-							class="first-letter:uppercase"
+							class="first-letter:uppercase truncate"
 							:value="day"
 							:key="day"
 						>

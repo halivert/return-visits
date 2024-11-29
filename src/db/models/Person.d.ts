@@ -7,8 +7,8 @@ type Coordinates = {
 export interface Person {
 	id: number
 	name: string
-	location: Coordinates
 	description: string
 	returnDay: number
 	colony: string
+	location?: Coordinates
 }
