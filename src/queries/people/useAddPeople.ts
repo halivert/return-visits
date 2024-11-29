@@ -17,7 +17,7 @@ export function useAddPeople() {
 		},
 		onSuccess: (person) => {
 			queryClient.invalidateQueries({ queryKey: peopleKeys.all() })
-			queryClient.invalidateQueries({ queryKey: peopleKeys.detail(person.id) })
+			queryClient.setQueryData(peopleKeys.detail(person.id), person)
 		},
 	})
 }

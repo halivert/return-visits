@@ -102,7 +102,9 @@ export async function getFromStore<TData>(
 
 			request.onsuccess = (event) => {
 				// @ts-expect-error result should be present
-				resolve(event.target.result)
+				const result: Person | undefined = event.target.result
+				if (result) return resolve(result)
+				return reject(new Error("No encontrado"))
 			}
 		} catch (error) {
 			reject(error)

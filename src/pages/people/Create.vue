@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
-import usePeopleQuery from "../../queries/people/usePeople"
+import { usePeopleQuery } from "../../queries/people/usePeople"
 import { useAddPeople } from "../../queries/people/useAddPeople"
 
 const DAYS = [
@@ -103,7 +103,7 @@ function handleSubmit(event: Event) {
 
 <template>
 	<main class="max-w-prose mx-auto py-2 px-3">
-		<h1 class="text-3xl font-bold mb-4">Nueva persona</h1>
+		<h1 class="text-3xl font-bold mb-4">Agregar persona</h1>
 
 		<form class="grid grid-cols-3 gap-2 gap-y-3" @submit.prevent="handleSubmit">
 			<label class="text-right" for="name">Nombre</label>

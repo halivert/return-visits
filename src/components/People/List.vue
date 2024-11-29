@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import usePeopleQuery from "../../queries/people/usePeople"
+import { usePeopleQuery } from "../../queries/people/usePeople"
 
 const peopleQuery = usePeopleQuery()
 
@@ -106,7 +106,14 @@ function resetForm() {
 				v-for="person in people"
 				class="bg-asparagus-100 rounded p-2 flex flex-col"
 			>
-				<h2 class="text-lg font-bold">{{ person.name }}</h2>
+				<h2 class="text-lg font-bold">
+					<router-link
+						class="underline hover:text-asparagus-700 focus:text-asparagus-700"
+						:to="`/people/${person.id}`"
+					>
+						{{ person.name || "Sin nombre" }}
+					</router-link>
+				</h2>
 
 				<h3>{{ person.colony }}</h3>
 

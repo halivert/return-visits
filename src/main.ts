@@ -8,4 +8,9 @@ import "./style.css"
 
 getDatabase()
 
-createApp(App).use(VueQueryPlugin).use(router).mount("#app")
+createApp(App)
+	.use(VueQueryPlugin, {
+		enableDevtoolsV6Plugin: true,
+	})
+	.use(router)
+	.mount("#app")

@@ -1,11 +1,6 @@
 import { useQuery } from "@tanstack/vue-query"
-import { peopleKeys } from "./peopleKeys"
-import { PEOPLE_STORE, getAllFromStore } from "../../db/useDatabase"
-import { Person } from "../../db/models/Person"
+import { peopleQuery } from "./peopleQuery"
 
-export default function usePeopleQuery() {
-	return useQuery({
-		queryKey: peopleKeys.all(),
-		queryFn: () => getAllFromStore<Person>(PEOPLE_STORE),
-	})
+export function usePeopleQuery() {
+	return useQuery(peopleQuery())
 }
