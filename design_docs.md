@@ -59,7 +59,7 @@ experience when sorting people by location.
 
 ### Storage
 
-We need to use pinia in order to manage the global state in app.
+We're going to use vue-query to make the syncronization between idb and the app.
 
 IndexedDB is going to serve us as database.
 The structure of the objects in the database should have the following

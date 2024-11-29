@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import usePeople from "../../queries/people/usePeople"
+import usePeopleQuery from "../../queries/people/usePeople"
 
-const peopleQuery = usePeople()
+const peopleQuery = usePeopleQuery()
 
 const DAYS = [
 	"domingo",

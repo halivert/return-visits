@@ -1,5 +1,3 @@
-import { Ref, ref } from "vue"
-
 export const PEOPLE_STORE = "people"
 export const RETURN_VISITS_STORE = "returnVisits"
 
@@ -45,16 +43,6 @@ export function getDatabase(): Promise<IDBDatabase> {
 	})
 }
 
-export function useDatabase(): Ref<IDBDatabase | null> {
-	const database = ref<IDBDatabase | null>(null)
-
-	getDatabase()
-		.then((newDatabase) => (database.value = newDatabase))
-		.catch(console.error)
-
-	return database
-}
-
 export async function getStore(
 	store: STORE,
 	transactionMode: IDBTransactionMode
@@ -72,10 +60,10 @@ export async function getStore(
 	})
 }
 
-export async function addToStore<
-	TData,
-	TKey extends IDBValidKey = IDBValidKey,
->(store: STORE, value: TData): Promise<TKey> {
+export async function addToStore<TData, TKey extends IDBValidKey = IDBValidKey>(
+	store: STORE,
+	value: TData
+): Promise<TKey> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const dbStore = await getStore(store, "readwrite")

@@ -3,7 +3,7 @@ import { peopleKeys } from "./peopleKeys"
 import { PEOPLE_STORE, getAllFromStore } from "../../db/useDatabase"
 import { Person } from "../../db/models/Person"
 
-export default function usePeople() {
+export default function usePeopleQuery() {
 	return useQuery({
 		queryKey: peopleKeys.all(),
 		queryFn: () => getAllFromStore<Person>(PEOPLE_STORE),
