@@ -4,7 +4,7 @@ import PWABadge from "@/components/PWABadge.vue"
 
 <template>
 	<div class="h-dvh overflow-y-scroll bg-lemon-50 text-rangoon-950">
-		<header class="max-w-prose mx-auto py-2 px-3">
+		<nav class="max-w-prose mx-auto py-2 px-3">
 			<RouterLink
 				class="inline-flex gap-3 items-center hover:underline hover:text-asparagus-700 focus:text-asparagus-700"
 				:to="{ name: 'Home' }"
@@ -17,7 +17,7 @@ import PWABadge from "@/components/PWABadge.vue"
 					alt="Libretita de colores"
 				/>
 			</RouterLink>
-		</header>
+		</nav>
 		<router-view></router-view>
 	</div>
 	<PWABadge />

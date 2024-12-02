@@ -103,12 +103,12 @@ function resetForm() {
 				class="bg-asparagus-100 rounded p-2 flex flex-col"
 			>
 				<h2 class="text-lg font-bold">
-					<router-link
+					<RouterLink
 						class="underline hover:text-asparagus-700 focus:text-asparagus-700"
 						:to="`/people/${person.id}`"
 					>
 						{{ person.name || "Sin nombre" }}
-					</router-link>
+					</RouterLink>
 				</h2>
 
 				<h3>{{ person.colony }}</h3>

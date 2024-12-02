@@ -33,7 +33,16 @@ function getDatetime(date: Date) {
 			class="border p-2 bg-asparagus-200 rounded"
 		>
 			<h2 class="text-xl font-semibold">
-				{{ returnVisit.topic }}
+				<RouterLink
+					:to="{
+						name: 'ReturnVisitsShow',
+						params: {
+							id: id,
+						},
+					}"
+				>
+					{{ returnVisit.topic }}
+				</RouterLink>
 			</h2>
 
 			<div class="flex justify-between">

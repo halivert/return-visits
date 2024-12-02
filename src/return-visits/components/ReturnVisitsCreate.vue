@@ -236,12 +236,12 @@ async function handleSubmit(event: Event) {
 			</small>
 		</div>
 
-		<router-link
+		<RouterLink
 			class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"
 			:to="{ name: 'PeopleShow', params: { id } }"
 		>
 			Cancelar
-		</router-link>
+		</RouterLink>
 
 		<button
 			class="col-start-3 bg-asparagus-600 rounded px-2 py-1 text-lemon-50"

@@ -8,12 +8,12 @@ import PeopleList from "@people/components/PeopleList.vue"
 			<PeopleList />
 
 			<div class="inline-block fixed bottom-4 right-5">
-				<router-link
+				<RouterLink
 					:to="{ name: 'PeopleCreate' }"
 					class="inline-block underline bg-lemon-100"
 				>
 					Agregar persona
-				</router-link>
+				</RouterLink>
 			</div>
 		</section>
 	</main>

@@ -97,25 +97,25 @@ useTitle(
 				<div class="flex justify-between">
 					<h2 class="text-xl font-semibold">Revisitas</h2>
 
-					<router-link
+					<RouterLink
 						:to="{ name: 'PeopleReturnVisitsCreate' }"
 						class="underline bg-lemon-100"
 						active-class="hidden"
 					>
 						Agregar revisita
-					</router-link>
+					</RouterLink>
 				</div>
 
 				<router-view class="mt-6" />
 			</section>
 
 			<div class="inline-block fixed bottom-4 right-5">
-				<router-link
+				<RouterLink
 					:to="{ name: 'PeopleEdit', params: { id } }"
 					class="inline-block underline bg-lemon-100"
 				>
 					Editar persona
-				</router-link>
+				</RouterLink>
 			</div>
 		</template>
 	</main>

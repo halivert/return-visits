@@ -11,12 +11,12 @@ const previousUrl = usePreviousUrl()
 				¡Ups! La página que intentas buscar no existe
 			</h1>
 
-			<router-link
+			<RouterLink
 				class="underline block w-fit mx-auto bg-lemon-100"
 				:to="previousUrl"
 			>
 				{{ previousUrl === "/" ? "Inicio" : "Atrás" }}
-			</router-link>
+			</RouterLink>
 		</div>
 	</main>
 </template>
