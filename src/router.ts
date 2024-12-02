@@ -25,7 +25,6 @@ export const router = createRouter({
 				},
 				{
 					path: ":id",
-					name: "PeopleShow",
 					component: () => import("../src/people/pages/Show.vue"),
 					props: (to) => ({
 						id: parseInt(to.params.id as string, 10),
@@ -33,13 +32,21 @@ export const router = createRouter({
 					children: [
 						{
 							path: "",
-							name: "PeopleReturnVisitsIndex",
-							component: () => import("../src/pages/NotFound.vue"),
+							name: "PeopleShow",
+							component: () =>
+								import("../src/return-visits/components/List.vue"),
+							props: (to) => ({
+								id: parseInt(to.params.id as string, 10),
+							}),
 						},
 						{
 							path: "return-visits/create",
 							name: "PeopleReturnVisitsCreate",
-							component: () => import("../src/pages/NotFound.vue"),
+							component: () =>
+								import("../src/return-visits/components/Create.vue"),
+							props: (to) => ({
+								id: parseInt(to.params.id as string, 10),
+							}),
 						},
 					],
 				},

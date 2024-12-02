@@ -51,6 +51,8 @@ const locationLink = computed(() => {
 	return `https://www.google.com/maps/search/${latitude},${longitude}`
 })
 
+const returnDay = computed<number | undefined>(() => undefined)
+
 useTitle(
 	computed(() =>
 		[person.value?.name, route.meta.appName].filter(Boolean).join(" | ")
@@ -81,8 +83,8 @@ useTitle(
 				</h2>
 			</div>
 
-			<span class="underline text-sm">
-				Volver el {{ DAYS[person.returnDay] }}
+			<span v-if="returnDay != undefined" class="underline text-sm">
+				Volver el {{ DAYS[returnDay] }}
 			</span>
 
 			<p>
@@ -96,16 +98,15 @@ useTitle(
 					<h2 class="text-xl font-semibold">Revisitas</h2>
 
 					<router-link
-						:to="{
-							name: 'PeopleReturnVisitsCreate',
-						}"
+						:to="{ name: 'PeopleReturnVisitsCreate' }"
 						class="underline bg-lemon-100"
+						active-class="hidden"
 					>
 						Agregar revisita
 					</router-link>
 				</div>
 
-				<router-view />
+				<router-view class="mt-6" />
 			</section>
 		</template>
 	</main>

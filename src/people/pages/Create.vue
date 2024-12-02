@@ -2,11 +2,8 @@
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
-import { usePeopleQuery } from "../../queries/people/usePeople"
-import { useAddPeople } from "../../queries/people/useAddPeople"
-import { DAYS } from "../../constants"
-
-const todayDay = computed(() => new Date().getDay())
+import { usePeopleQuery } from "../queries/usePeople"
+import { useAddPeople } from "../queries/useAddPeople"
 
 const router = useRouter()
 
@@ -31,7 +28,6 @@ async function addPerson(
 	try {
 		await addPersonMutation.mutateAsync({
 			colony: data.colony as string,
-			returnDay: parseInt(data.returnDay as string, 10),
 			description: data.description as string,
 			name: data.name as string,
 			location: coords
@@ -146,37 +142,6 @@ function handleSubmit(event: Event) {
 				<datalist id="colonyList">
 					<option v-for="colony in colonies" :key="colony">{{ colony }}</option>
 				</datalist>
-			</div>
-
-			<label class="text-right" for="returnDay">Día de revisita</label>
-
-			<div class="col-span-2">
-				<select
-					id="returnDay"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'w-full text-base h-8',
-						errors['returnDay']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					name="returnDay"
-					:value="todayDay"
-					required
-				>
-					<option
-						v-for="(day, i) in DAYS"
-						:value="i"
-						:key="i"
-						class="inline-block first-letter:uppercase"
-					>
-						{{ day }}
-					</option>
-				</select>
-
-				<small class="text-chili-600" v-if="errors['returnDay']">
-					{{ errors["returnDay"] }}
-				</small>
 			</div>
 
 			<label class="text-right" for="description">Descripción</label>

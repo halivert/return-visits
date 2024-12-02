@@ -8,7 +8,6 @@ export interface Person {
 	id: number
 	name: string
 	description: string
-	returnDay: number
 	colony: string
 	location?: Coordinates
 }

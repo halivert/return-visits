@@ -1,7 +1,7 @@
 import { computed, MaybeRef, unref, UnwrapRef } from "vue"
 import { UseQueryOptions } from "@tanstack/vue-query"
 import { peopleKeys } from "./peopleKeys"
-import { getAllFromStore, PEOPLE_STORE } from "../../db/useDatabase"
+import { getAllFromStore } from "../../db/useDatabase"
 import { Person } from "../../db/models/Person"
 
 type QueryOptions = UseQueryOptions<
@@ -18,6 +18,6 @@ export function peopleQuery(
 	return computed(() => ({
 		...unref(options),
 		queryKey: peopleKeys.all(),
-		queryFn: () => getAllFromStore<Person>(PEOPLE_STORE),
+		queryFn: () => getAllFromStore("people"),
 	}))
 }

@@ -71,16 +71,16 @@ Person
 	id: number
 	name: string
 	location: GeolocationPosition
-	description: string
-	returnDay: number
 	colony: string
+	description: string
 }
 
 ReturnVisit
 {
-	person_id: number
+	personId: number
 	date: date
 	topic: string
+	returnDate: date
 	notes: string
 }
 ```

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query"
 import { Person } from "../../db/models/Person"
-import { addToStore, PEOPLE_STORE } from "../../db/useDatabase"
+import { addToStore } from "../../db/useDatabase"
 import { peopleKeys } from "./peopleKeys"
 
 export function useAddPeople() {
@@ -8,7 +8,7 @@ export function useAddPeople() {
 
 	return useMutation({
 		mutationFn: async (person: Omit<Person, "id">): Promise<Person> => {
-			const newPersonId: number = await addToStore(PEOPLE_STORE, person)
+			const newPersonId = await addToStore("people", person)
 
 			return {
 				id: newPersonId,

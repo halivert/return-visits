@@ -1,7 +1,45 @@
+import { ReturnVisit } from "../return-visits/models/ReturnVisit"
+import { Person } from "./models/Person"
+import { CreateType, Stores as BaseStores } from "./types/database"
+
 export const PEOPLE_STORE = "people"
 export const RETURN_VISITS_STORE = "returnVisits"
 
-type STORE = typeof PEOPLE_STORE | typeof RETURN_VISITS_STORE
+function defineStores<T extends BaseStores>(stores: T): T {
+	return stores
+}
+
+const stores = defineStores({
+	people: {
+		type: {} as Person,
+		key: 0,
+		options: {
+			keyPath: "id" as const,
+			autoIncrement: true,
+		},
+		indexes: {
+			name: ["name"],
+			location: ["location"],
+			colony: ["colony"],
+		},
+	},
+	returnVisits: {
+		type: {} as ReturnVisit,
+		key: ["", new Date()] as [string, Date],
+		options: {
+			keyPath: ["personId", "date"],
+		},
+		indexes: {
+			personId: ["personId"],
+			date: ["date"],
+			returnDate: ["returnDate"],
+			topic: ["topic"],
+		},
+	},
+})
+
+type Stores = typeof stores
+type Store = keyof Stores
 
 export function getDatabase(): Promise<IDBDatabase> {
 	return new Promise((resolve, reject) => {
@@ -14,21 +52,13 @@ export function getDatabase(): Promise<IDBDatabase> {
 			// @ts-expect-error result should be in event.target
 			const db: IDBDatabase = event.target.result
 
-			const peopleStore = db.createObjectStore(PEOPLE_STORE, {
-				keyPath: "id",
-				autoIncrement: true,
+			Object.entries(stores).forEach(([storeName, options]) => {
+				const store = db.createObjectStore(storeName, options.options)
+
+				Object.entries(options.indexes).forEach(([indexName, options]) => {
+					store.createIndex(indexName, ...options)
+				})
 			})
-
-			peopleStore.createIndex("name", "name")
-			peopleStore.createIndex("location", "location")
-			peopleStore.createIndex("returnDay", "returnDay")
-			peopleStore.createIndex("colony", "colony")
-
-			const returnVisitsStore = db.createObjectStore(RETURN_VISITS_STORE, {
-				keyPath: ["personId", "date"],
-			})
-
-			returnVisitsStore.createIndex("topic", "topic")
 		}
 
 		request.onsuccess = (event) => {
@@ -44,7 +74,7 @@ export function getDatabase(): Promise<IDBDatabase> {
 }
 
 export async function getStore(
-	store: STORE,
+	store: Store,
 	transactionMode: IDBTransactionMode
 ): Promise<IDBObjectStore> {
 	return new Promise(async (resolve, reject) => {
@@ -60,10 +90,10 @@ export async function getStore(
 	})
 }
 
-export async function addToStore<TData, TKey extends IDBValidKey = IDBValidKey>(
-	store: STORE,
-	value: TData
-): Promise<TKey> {
+export async function addToStore<TStore extends Store>(
+	store: TStore,
+	value: CreateType<Stores, TStore>
+): Promise<Stores[TStore]["key"]> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			if (import.meta.env.DEV) {
@@ -75,7 +105,8 @@ export async function addToStore<TData, TKey extends IDBValidKey = IDBValidKey>(
 
 			request.onerror = (event) => {
 				// @ts-expect-error result should be present
-				reject(new Error(event.target.result))
+				const result = event.target.result
+				reject(new Error(result || "Error, elemento duplicado"))
 			}
 
 			request.onsuccess = (event) => {
@@ -88,10 +119,10 @@ export async function addToStore<TData, TKey extends IDBValidKey = IDBValidKey>(
 	})
 }
 
-export async function getFromStore<TData>(
-	store: STORE,
-	query: IDBValidKey | IDBKeyRange
-): Promise<TData> {
+export async function getFromStore<TStore extends Store>(
+	store: TStore,
+	query: Stores[TStore]["key"]
+): Promise<Stores[TStore]["type"]> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			if (import.meta.env.DEV) {
@@ -108,7 +139,7 @@ export async function getFromStore<TData>(
 
 			request.onsuccess = (event) => {
 				// @ts-expect-error result should be present
-				const result: Person | undefined = event.target.result
+				const result: TData | undefined = event.target.result
 				if (result) return resolve(result)
 				return reject(new Error("No encontrado"))
 			}
@@ -118,31 +149,37 @@ export async function getFromStore<TData>(
 	})
 }
 
-export async function getAllFromStore<TData>(
-	store: STORE,
+export async function getAllFromStore<TStore extends Store>(
+	store: TStore,
+	index?: keyof Stores[TStore]["indexes"],
 	query?: IDBValidKey | IDBKeyRange | null,
 	count?: number
-): Promise<TData[]> {
+): Promise<Array<Stores[TStore]["type"]>> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			if (import.meta.env.DEV) {
-				console.log(`Querying all from from ${store}`, { query, count })
+				console.log(`Querying all from from ${store}`, { index, query, count })
 			}
+
 			const dbStore = await getStore(store, "readonly")
 
-			const request = dbStore.getAll(query, count)
+			const request = index
+				? dbStore.index(index as string).getAll(query, count)
+				: dbStore.getAll(query, count)
 
 			request.onerror = (event) => {
 				// @ts-expect-error result should be present
-				reject(new Error(event.target.result))
+				const result = event.target.result
+				reject(new Error(result))
 			}
 
 			request.onsuccess = (event) => {
 				// @ts-expect-error result should be present
-				resolve(event.target.result)
+				const result = event.target.result
+				resolve(result)
 			}
 		} catch (error) {
-			reject(error)
+			reject(error instanceof Error ? error : new Error("Error desconocido"))
 		}
 	})
 }
