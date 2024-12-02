@@ -23,6 +23,10 @@ function getDatetime(date: Date) {
 		timeStyle: "short",
 	}).format(date)
 }
+
+function getUrlDate(date: Date) {
+	return encodeURIComponent(date.toISOString().split(":00.")[0])
+}
 </script>
 
 <template>
@@ -34,10 +38,12 @@ function getDatetime(date: Date) {
 		>
 			<h2 class="text-xl font-semibold">
 				<RouterLink
+					class="text-asparagus-800 underline"
 					:to="{
-						name: 'ReturnVisitsShow',
+						name: 'PeopleReturnVisitsEdit',
 						params: {
 							id: id,
+							date: getUrlDate(returnVisit.date),
 						},
 					}"
 				>

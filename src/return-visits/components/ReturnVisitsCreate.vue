@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import { useAddReturnVisit } from "../queries/useAddReturnVisit"
-import { router } from "../../router"
-import { usePersonReturnVisits } from "../queries/usePersonReturnVisits"
+import { useRouter } from "vue-router"
+import { useAddReturnVisit } from "@return-visits/queries/useAddReturnVisit"
+import { usePersonReturnVisits } from "@return-visits/queries/usePersonReturnVisits"
+
+const router = useRouter()
 
 const props = defineProps<{
 	id: number
@@ -74,7 +76,8 @@ async function handleSubmit(event: Event) {
 			returnDate,
 			notes: data.notes as string,
 		})
-		router.replace({ name: "PeopleShow", params: { id: id.value } })
+
+		router.back()
 	} catch (error) {
 		errors.value = {
 			...errors.value,

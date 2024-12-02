@@ -48,6 +48,16 @@ export const router = createRouter({
 								id: parseInt(to.params.id as string, 10),
 							}),
 						},
+						{
+							path: "return-visits/:date/edit",
+							name: "PeopleReturnVisitsEdit",
+							component: () =>
+								import("@return-visits/components/ReturnVisitsEdit.vue"),
+							props: (to) => ({
+								id: parseInt(to.params.id as string, 10),
+								date: new Date(decodeURIComponent(to.params.date as string)),
+							}),
+						},
 					],
 				},
 				{
