@@ -108,6 +108,15 @@ useTitle(
 
 				<router-view class="mt-6" />
 			</section>
+
+			<div class="inline-block fixed bottom-4 right-5">
+				<router-link
+					:to="{ name: 'PeopleEdit', params: { id } }"
+					class="inline-block underline bg-lemon-100"
+				>
+					Editar persona
+				</router-link>
+			</div>
 		</template>
 	</main>
 </template>

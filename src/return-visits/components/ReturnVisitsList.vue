@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import { usePersonReturnVisits } from "../queries/usePersonReturnVisits"
+import { usePersonReturnVisits } from "@return-visits/queries/usePersonReturnVisits"
 
 const props = defineProps<{
 	id: number
@@ -29,7 +29,7 @@ function getDatetime(date: Date) {
 	<div class="flex flex-col gap-4" v-if="returnVisits">
 		<article
 			v-for="returnVisit in returnVisits"
-			:key="returnVisit.personId + returnVisit.date.toISOString()"
+			:key="`${returnVisit.personId}-${returnVisit.date.toISOString()}`"
 			class="border p-2 bg-asparagus-200 rounded"
 		>
 			<h2 class="text-xl font-semibold">

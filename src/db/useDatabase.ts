@@ -119,6 +119,53 @@ export async function addToStore<TStore extends Store>(
 	})
 }
 
+export async function updateInStore<TStore extends Store>(
+	store: TStore,
+	key: Stores[TStore]["key"],
+	value: Partial<Stores[TStore]["type"]>
+): Promise<Stores[TStore]["key"]> {
+	return new Promise(async (resolve, reject) => {
+		try {
+			if (import.meta.env.DEV) {
+				console.log(`Updating in ${store}, item ${key}`, { value })
+			}
+			const dbStore = await getStore(store, "readwrite")
+			const cursorRequest = dbStore.openCursor(key)
+
+			cursorRequest.onsuccess = (event) => {
+				// @ts-expect-error result should be cursor
+				const cursor: IDBCursorWithValue = event.target.result
+				if (!cursor) {
+					reject(new Error("Error, elemento no encontrado"))
+					return
+				}
+
+				const request = cursor.update(value)
+
+				request.onerror = (event) => {
+					// @ts-expect-error result should be present
+					const result = event.target.result
+					reject(new Error(result || "Error en la actualización"))
+				}
+
+				request.onsuccess = (event) => {
+					// @ts-expect-error result should be present
+					const result = event.target.result
+					resolve(result)
+				}
+			}
+
+			cursorRequest.onerror = (event) => {
+				// @ts-expect-error result should be present
+				const result = event.target.result
+				reject(new Error(result || "Error, elemento no encontrado"))
+			}
+		} catch (error) {
+			reject(error)
+		}
+	})
+}
+
 export async function getFromStore<TStore extends Store>(
 	store: TStore,
 	query: Stores[TStore]["key"]

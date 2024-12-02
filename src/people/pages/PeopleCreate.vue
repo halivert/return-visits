@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
-import { usePeopleQuery } from "../queries/usePeople"
-import { useAddPeople } from "../queries/useAddPeople"
+import { useAddPeople } from "@people/queries/useAddPeople"
+import { useColonies } from "@people/composables/useColonies"
 
 const router = useRouter()
 
-const peopleQuery = usePeopleQuery()
-
 const addPersonMutation = useAddPeople()
 
-const colonies = computed(
-	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony))
-)
+const colonies = useColonies()
 
 const geolocation = useGeolocation({ immediate: false })
 
@@ -144,6 +140,26 @@ function handleSubmit(event: Event) {
 				</datalist>
 			</div>
 
+			<label class="text-right" for="location">Ubicación</label>
+
+			<div class="col-span-2 self-center">
+				<input
+					type="checkbox"
+					id="location"
+					:class="[
+						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm',
+						errors['location']
+							? 'border-chili-400 accent-chili-600'
+							: 'border-asparagus-100 accent-asparagus-600',
+					]"
+					name="location"
+				/>
+
+				<small class="text-chili-600" v-if="errors['location']">
+					{{ errors["location"] }}
+				</small>
+			</div>
+
 			<label class="text-right" for="description">Descripción</label>
 
 			<div class="col-span-2">
@@ -163,26 +179,6 @@ function handleSubmit(event: Event) {
 
 				<small class="text-chili-600" v-if="errors['description']">
 					{{ errors["description"] }}
-				</small>
-			</div>
-
-			<label class="text-right" for="location">Ubicación</label>
-
-			<div class="col-span-2 self-center">
-				<input
-					type="checkbox"
-					id="location"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm',
-						errors['location']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					name="location"
-				/>
-
-				<small class="text-chili-600" v-if="errors['location']">
-					{{ errors["location"] }}
 				</small>
 			</div>
 

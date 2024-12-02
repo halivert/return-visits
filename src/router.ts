@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router"
-import Home from "./pages/Home.vue"
-import NotFound from "./pages/NotFound.vue"
+import AppHome from "@/pages/AppHome.vue"
+import NotFound from "@/pages/NotFound.vue"
 
 const appName = "Revisitas"
 
@@ -10,7 +10,7 @@ export const router = createRouter({
 		{
 			path: "/",
 			name: "Home",
-			component: Home,
+			component: AppHome,
 		},
 		{
 			path: "/people",
@@ -18,14 +18,14 @@ export const router = createRouter({
 				{
 					path: "create",
 					name: "PeopleCreate",
-					component: () => import("../src/people/pages/Create.vue"),
+					component: () => import("@people/pages/PeopleCreate.vue"),
 					meta: {
 						title: `Agregar persona | ${appName}`,
 					},
 				},
 				{
 					path: ":id",
-					component: () => import("../src/people/pages/Show.vue"),
+					component: () => import("@people/pages/PeopleShow.vue"),
 					props: (to) => ({
 						id: parseInt(to.params.id as string, 10),
 					}),
@@ -34,7 +34,7 @@ export const router = createRouter({
 							path: "",
 							name: "PeopleShow",
 							component: () =>
-								import("../src/return-visits/components/List.vue"),
+								import("@return-visits/components/ReturnVisitsList.vue"),
 							props: (to) => ({
 								id: parseInt(to.params.id as string, 10),
 							}),
@@ -43,12 +43,20 @@ export const router = createRouter({
 							path: "return-visits/create",
 							name: "PeopleReturnVisitsCreate",
 							component: () =>
-								import("../src/return-visits/components/Create.vue"),
+								import("@return-visits/components/ReturnVisitsCreate.vue"),
 							props: (to) => ({
 								id: parseInt(to.params.id as string, 10),
 							}),
 						},
 					],
+				},
+				{
+					path: ":id/edit",
+					name: "PeopleEdit",
+					component: () => import("@people/pages/PeopleEdit.vue"),
+					props: (to) => ({
+						id: parseInt(to.params.id as string, 10),
+					}),
 				},
 			],
 		},

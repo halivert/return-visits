@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import { usePeopleQuery } from "../queries/usePeople"
-import { DAYS } from "../../constants"
+import { usePeopleQuery } from "@people/queries/usePeople"
+import { DAYS } from "@/constants"
 
 const peopleQuery = usePeopleQuery()
 
@@ -14,9 +14,7 @@ const showFilters = computed(() => {
 	return peopleQuery.data.value.length > 1
 })
 
-const days = computed(
-	() => new Set(peopleQuery.data.value?.map(({ returnDay }) => returnDay))
-)
+const days = computed(() => [])
 
 const colonies = computed(
 	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony))
@@ -26,7 +24,7 @@ const people = computed(
 	() =>
 		peopleQuery.data.value?.filter((people) => {
 			if (selectedDays.value.length) {
-				if (!selectedDays.value.includes(people.returnDay)) return false
+				// if (!selectedDays.value.includes(people.returnDay)) return false
 			}
 
 			if (selectedColonies.value.length) {
@@ -101,6 +99,7 @@ function resetForm() {
 		>
 			<article
 				v-for="person in people"
+				:key="person.id"
 				class="bg-asparagus-100 rounded p-2 flex flex-col"
 			>
 				<h2 class="text-lg font-bold">
@@ -114,7 +113,7 @@ function resetForm() {
 
 				<h3>{{ person.colony }}</h3>
 
-				<small>Volver el {{ DAYS[person.returnDay] }}</small>
+				<!-- <small>Volver el {{ DAYS[person.returnDay] }}</small> -->
 
 				<p class="mt-5">
 					{{ person.description }}

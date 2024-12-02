@@ -1,13 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue"
-import { useRouter } from "vue-router"
+import { usePreviousUrl } from "@/composables/usePreviousUrl"
 
-const router = useRouter()
-
-const previousPage = computed(() => {
-	const lastPath = router.options.history.state.back
-	return typeof lastPath === "string" ? lastPath : "/"
-})
+const previousUrl = usePreviousUrl()
 </script>
 
 <template>
@@ -19,9 +13,9 @@ const previousPage = computed(() => {
 
 			<router-link
 				class="underline block w-fit mx-auto bg-lemon-100"
-				:to="previousPage"
+				:to="previousUrl"
 			>
-				{{ previousPage === "/" ? "Inicio" : "Atrás" }}
+				{{ previousUrl === "/" ? "Inicio" : "Atrás" }}
 			</router-link>
 		</div>
 	</main>

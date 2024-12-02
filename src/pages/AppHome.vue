@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PeopleList from "../people/components/List.vue"
+import PeopleList from "@people/components/PeopleList.vue"
 </script>
 
 <template>
@@ -19,7 +19,7 @@ import PeopleList from "../people/components/List.vue"
 
 			<div class="inline-block fixed bottom-4 right-5">
 				<router-link
-					to="/people/create"
+					:to="{ name: 'PeopleCreate' }"
 					class="inline-block underline bg-lemon-100"
 				>
 					Agregar persona
