@@ -3,6 +3,10 @@ import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useAddReturnVisit } from "@/return-visits/queries/useAddReturnVisit"
 import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
+import {
+	getDateForInput,
+	getTimeForInput,
+} from "@/return-visits/composables/getDateTimeForInput"
 
 const router = useRouter()
 
@@ -21,53 +25,46 @@ const availableTopics = computed(
 )
 
 const now = new Date()
-const offset = now.getTimezoneOffset()
-const date = ref(
-	new Date(now.getTime() - offset * 60 * 1000).toISOString().split("T")[0]
-)
+const date = ref(getDateForInput(now))
 
 const returnDate = ref(
-	new Date(now.getTime() - offset * 60 * 1000 + 7 * 24 * 60 * 60 * 1000)
-		.toISOString()
-		.split("T")[0]
+	getDateForInput(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000))
 )
 
-const defaultTime =
-	now.getHours().toString().padStart(2, "0") +
-	":" +
-	now.getMinutes().toString().padStart(2, "0")
+const defaultTime = getTimeForInput(now)
 
 async function handleSubmit(event: Event) {
 	const data = Object.fromEntries(new FormData(event.target as HTMLFormElement))
 
 	if (!data.date) {
-		errors.value = { ...errors.value, date: "Por favor selecciona una fecha" }
+		errors.value = { ...errors.value, date: "Falta fecha" }
 	}
 
 	if (!data.time) {
-		errors.value = { ...errors.value, time: "Por favor selecciona una hora" }
+		errors.value = { ...errors.value, time: "Falta hora" }
 	}
 
 	if (!data.topic) {
-		errors.value = { ...errors.value, topic: "Por favor escribe un tema" }
+		errors.value = { ...errors.value, topic: "Falta tema" }
 	}
 
 	if (!data.returnDate) {
-		errors.value = {
-			...errors.value,
-			returnDate: "Por favor selecciona una fecha de revisita",
-		}
+		errors.value = { ...errors.value, returnDate: "Falta fecha de revisita" }
 	}
 
 	if (!data.returnTime) {
-		errors.value = {
-			...errors.value,
-			returnTime: "Por favor selecciona una fecha de revisita",
-		}
+		errors.value = { ...errors.value, returnTime: "Falta hora de revisita" }
 	}
 
 	const date = new Date(data.date + "T" + data.time)
 	const returnDate = new Date(data.returnDate + "T" + data.returnTime)
+
+	if (date.getTime() > returnDate.getTime()) {
+		errors.value = {
+			...errors.value,
+			returnDate: "Fecha de revisita tiene que ser posterior a fecha de visita",
+		}
+	}
 
 	try {
 		await addReturnVisitMutation.mutateAsync({
