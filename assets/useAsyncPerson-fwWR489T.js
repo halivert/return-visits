@@ -1,1 +1,0 @@
-import{K as s,g as t,p as o,B as a,A as y,u as p}from"./index-eDdqost2.js";function n(e,r={}){return s(()=>({...t(r),queryKey:o.detail(e),queryFn:({queryKey:u})=>a("people",u[2])}))}function c({id:e,options:r}){return y(n(e,r))}function l({id:e,options:r}){return p().ensureQueryData(n(e,r))}export{l as a,c as u};
