@@ -19,6 +19,7 @@ import { useTitle } from "@vueuse/core"
 import { usePerson } from "../queries/usePerson"
 import { useAsyncPerson } from "../queries/useAsyncPerson"
 import { DAYS } from "../../constants"
+import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
 
 const router = useRouter()
 const route = useRoute()
@@ -34,10 +35,9 @@ const props = defineProps<{
 }>()
 
 const id = computed(() => props.id)
-
 const personQuery = usePerson({ id })
-
 const person = computed(() => personQuery.data.value)
+const returnVisitsQuery = usePersonReturnVisits({ personId: id })
 
 const locationLink = computed(() => {
 	if (!person.value) return ""
@@ -51,7 +51,9 @@ const locationLink = computed(() => {
 	return `https://www.google.com/maps/search/${latitude},${longitude}`
 })
 
-const returnDay = computed<number | undefined>(() => undefined)
+const returnDay = computed<number | undefined>(
+	() => returnVisitsQuery.data.value?.at(0)?.returnDate.getDay()
+)
 
 useTitle(
 	computed(() =>
@@ -89,6 +91,15 @@ useTitle(
 
 			<p class="whitespace-pre-line">{{ person.description }}</p>
 
+			<div class="text-right">
+				<RouterLink
+					:to="{ name: 'PeopleEdit', params: { id } }"
+					class="underline bg-lemon-100"
+				>
+					Editar persona
+				</RouterLink>
+			</div>
+
 			<hr class="h-0.5 bg-asparagus-600 my-3" />
 
 			<section class="px-2 py-1">
@@ -106,15 +117,6 @@ useTitle(
 
 				<router-view class="mt-6" />
 			</section>
-
-			<div class="inline-block fixed bottom-4 right-5">
-				<RouterLink
-					:to="{ name: 'PeopleEdit', params: { id } }"
-					class="inline-block underline bg-lemon-100"
-				>
-					Editar persona
-				</RouterLink>
-			</div>
 		</template>
 	</main>
 </template>
