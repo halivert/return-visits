@@ -19,13 +19,7 @@ export function useDeleteReturnVisit({
 			await deleteFromStore("returnVisits", [unref(personId), unref(date)])
 		}),
 		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: returnVisitsKeys.list(personId),
-			})
-
-			queryClient.invalidateQueries({
-				queryKey: returnVisitsKeys.detail(personId, date),
-			})
+			queryClient.invalidateQueries({ queryKey: returnVisitsKeys.all() })
 		},
 	})
 }

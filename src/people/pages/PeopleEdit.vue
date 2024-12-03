@@ -21,6 +21,7 @@ import { useColonies } from "@/people/composables/useColonies"
 import { Person } from "@/db/models/Person"
 import { useAsyncPerson } from "@/people/queries/useAsyncPerson"
 import { useUpdatePerson } from "@/people/queries/useUpdatePerson"
+import { useDeletePerson } from "../queries/useDeletePerson"
 
 const router = useRouter()
 const colonies = useColonies()
@@ -40,6 +41,14 @@ const id = computed(() => props.id)
 
 const personQuery = usePerson({ id })
 const person = computed(() => personQuery.data.value)
+const updatePersonMutation = useUpdatePerson({ id })
+const deletePerson = useDeletePerson({ id })
+
+const personForm = reactive<Omit<Person, "id" | "location">>({
+	name: person.value?.name ?? "",
+	colony: person.value?.colony ?? "",
+	description: person.value?.description ?? "",
+})
 
 watch(person, (person) => {
 	if (!person) return
@@ -49,15 +58,8 @@ watch(person, (person) => {
 	personForm.description = person.description
 })
 
-const personForm = reactive<Omit<Person, "id" | "location">>({
-	name: person.value?.name ?? "",
-	colony: person.value?.colony ?? "",
-	description: person.value?.description ?? "",
-})
 const errors = ref<Record<string, string>>({})
 const locationRecentlyUpdated = ref(false)
-
-const updatePersonMutation = useUpdatePerson({ id })
 
 async function updatePerson(person: Partial<Omit<Person, "id">>) {
 	if (updatePersonMutation.isPending.value) return
@@ -137,6 +139,20 @@ function updatePersonLocation() {
 
 function removePersonLocation() {
 	updatePerson({ location: undefined })
+}
+
+async function handleDeletePerson() {
+	const answer = confirm("¿Segura que deseas eliminar a esta persona?")
+
+	if (!answer) return
+
+	try {
+		await deletePerson.mutateAsync()
+
+		router.go(-2)
+	} catch (e) {
+		console.info(e)
+	}
 }
 </script>
 
@@ -286,6 +302,14 @@ function removePersonLocation() {
 					:disabled="updatePersonMutation.isPending.value"
 				>
 					Guardar
+				</button>
+
+				<button
+					class="col-start-2 bg-fawn-600 rounded px-2 py-1 text-fawn-50 text-center"
+					@click="handleDeletePerson"
+					type="button"
+				>
+					Eliminar
 				</button>
 			</form>
 		</template>
