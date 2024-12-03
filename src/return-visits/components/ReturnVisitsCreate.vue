@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, reactive } from "vue"
 import { useRouter } from "vue-router"
 import { useAddReturnVisit } from "@/return-visits/queries/useAddReturnVisit"
-import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
 import {
 	getDateForInput,
 	getTimeForInput,
 } from "@/return-visits/composables/getDateTimeForInput"
+import VInput from "@/components/form/VInput.vue"
+import VTextarea from "@/components/form/VTextarea.vue"
+import { useAvailableTopics } from "@/return-visits/composables/useAvailableTopics"
+import VInputErrors from "@/components/form/VInputErrors.vue"
+
+type Errors<T> = Partial<Record<keyof T, string>>
 
 const router = useRouter()
 
@@ -16,70 +21,69 @@ const props = defineProps<{
 
 const id = computed(() => props.id)
 
-const returnVisitsQuery = usePersonReturnVisits({ personId: id })
 const addReturnVisitMutation = useAddReturnVisit({ personId: id })
-
-const errors = ref<Record<string, string>>({})
-const availableTopics = computed(
-	() => new Set(returnVisitsQuery.data.value?.map(({ topic }) => topic))
-)
+const availableTopics = useAvailableTopics()
 
 const now = new Date()
-const date = ref(getDateForInput(now))
+const sevenDaysAfter = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
-const returnDate = ref(
-	getDateForInput(new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000))
-)
+const returnVisitForm = reactive({
+	date: getDateForInput(now),
+	time: getTimeForInput(now),
+	topic: "",
+	returnDate: getDateForInput(sevenDaysAfter),
+	returnTime: getTimeForInput(sevenDaysAfter),
+	notes: "",
+})
 
-const defaultTime = getTimeForInput(now)
+const errors = reactive<Errors<typeof returnVisitForm>>({})
 
-async function handleSubmit(event: Event) {
-	const data = Object.fromEntries(new FormData(event.target as HTMLFormElement))
-
-	if (!data.date) {
-		errors.value = { ...errors.value, date: "Falta fecha" }
+async function handleSubmit() {
+	if (!returnVisitForm.date) {
+		errors.date = "Falta fecha"
 	}
 
-	if (!data.time) {
-		errors.value = { ...errors.value, time: "Falta hora" }
+	if (!returnVisitForm.time) {
+		errors.time = "Falta hora"
 	}
 
-	if (!data.topic) {
-		errors.value = { ...errors.value, topic: "Falta tema" }
+	if (!returnVisitForm.topic) {
+		errors.topic = "Falta tema"
 	}
 
-	if (!data.returnDate) {
-		errors.value = { ...errors.value, returnDate: "Falta fecha de revisita" }
+	if (!returnVisitForm.returnDate) {
+		errors.returnDate = "Falta fecha de revisita"
 	}
 
-	if (!data.returnTime) {
-		errors.value = { ...errors.value, returnTime: "Falta hora de revisita" }
+	if (!returnVisitForm.returnTime) {
+		errors.returnTime = "Falta hora de revisita"
 	}
 
-	const date = new Date(data.date + "T" + data.time)
-	const returnDate = new Date(data.returnDate + "T" + data.returnTime)
+	const date = new Date(returnVisitForm.date + "T" + returnVisitForm.time)
+	const returnDate = new Date(
+		returnVisitForm.returnDate + "T" + returnVisitForm.returnTime
+	)
 
 	if (date.getTime() > returnDate.getTime()) {
-		errors.value = {
-			...errors.value,
-			returnDate: "Fecha de revisita tiene que ser posterior a fecha de visita",
-		}
+		errors.returnDate =
+			"Fecha de revisita tiene que ser posterior a fecha de visita"
+	}
+
+	if (Object.values(errors).some(Boolean)) {
+		return
 	}
 
 	try {
 		await addReturnVisitMutation.mutateAsync({
 			date,
-			topic: data.topic as string,
+			topic: returnVisitForm.topic as string,
 			returnDate,
-			notes: data.notes as string,
+			notes: returnVisitForm.notes as string,
 		})
 
 		router.back()
 	} catch (error) {
-		errors.value = {
-			...errors.value,
-			time: error instanceof Error ? error.message : "Error desconocido",
-		}
+		errors.time = error instanceof Error ? error.message : "Error desconocido"
 	}
 }
 </script>
@@ -94,74 +98,47 @@ async function handleSubmit(event: Event) {
 
 		<div class="col-span-2">
 			<div class="flex flex-wrap gap-2">
-				<input
+				<VInput
+					div-class="flex-1"
 					id="date"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 flex-1',
-						errors['date']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
 					type="date"
-					name="date"
-					v-model="date"
-					@input="errors['date'] = ''"
+					v-model="returnVisitForm.date"
+					v-model:errors="errors.date"
+					hide-errors
 					required
 				/>
 
-				<input
+				<VInput
+					div-class="flex-1"
 					id="time"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 flex-1',
-						errors['time']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
 					type="time"
-					name="time"
-					:value="defaultTime"
-					@input="errors['time'] = ''"
+					v-model="returnVisitForm.time"
+					v-model:errors="errors.time"
+					hide-errors
 					required
 				/>
 			</div>
-			<small class="text-chili-600" v-if="errors['date'] || errors['time']">
-				{{ errors["date"] }} <br v-if="errors['date'] && errors['time']" />
-				{{ errors["time"] }}
-			</small>
+
+			<VInputErrors :errors="[errors.date, errors.time]" />
 		</div>
 
 		<label class="text-right" for="topic">Tema</label>
 
-		<div class="col-span-2">
-			<input
-				id="topic"
-				:class="[
-					'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-					'h-8 w-full',
-					errors['topic']
-						? 'border-chili-400 accent-chili-600'
-						: 'border-asparagus-100 accent-asparagus-600',
-				]"
-				type="string"
-				name="topic"
-				@input="errors['topic'] = ''"
-				placeholder="En esta visita hablamos de..."
-				list="topicDataList"
-				required
-			/>
+		<VInput
+			div-class="col-span-2"
+			id="topic"
+			v-model="returnVisitForm.topic"
+			v-model:errors="errors.topic"
+			placeholder="En esta visita hablamos de..."
+			list="topicDataList"
+			required
+		/>
 
-			<small class="text-chili-600" v-if="errors['topic']">
-				{{ errors["topic"] }}
-			</small>
-
-			<datalist id="topicDataList">
-				<option v-for="topic in availableTopics" :key="topic">
-					{{ topic }}
-				</option>
-			</datalist>
-		</div>
+		<datalist id="topicDataList">
+			<option v-for="topic in availableTopics" :key="topic">
+				{{ topic }}
+			</option>
+		</datalist>
 
 		<div class="text-right">
 			<label for="returnDate">Fecha</label>
@@ -172,71 +149,41 @@ async function handleSubmit(event: Event) {
 
 		<div class="col-span-2">
 			<div class="flex flex-wrap gap-2">
-				<input
+				<VInput
 					id="returnDate"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 flex-1',
-						errors['returnDate']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
+					div-class="flex-1"
 					type="date"
-					name="returnDate"
-					v-model="returnDate"
-					:min="date"
-					@change="errors['returnDate'] = ''"
+					v-model="returnVisitForm.returnDate"
+					:min="returnVisitForm.date"
+					v-model:errors="errors.returnDate"
+					hide-errors
 					required
 				/>
 
-				<input
+				<VInput
 					id="returnTime"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 flex-1',
-						errors['returnTime']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
+					div-class="flex-1"
 					type="time"
-					name="returnTime"
-					:value="defaultTime"
-					@input="errors['returnTime'] = ''"
+					v-model="returnVisitForm.returnTime"
+					v-model:errors="errors.returnTime"
+					hide-errors
 					required
 				/>
 			</div>
-			<small
-				class="text-chili-600"
-				v-if="errors['returnDate'] || errors['returnTime']"
-			>
-				{{ errors["returnDate"] }}
-				<br v-if="errors['returnDate'] && errors['returnTime']" />
-				{{ errors["returnTime"] }}
-			</small>
+
+			<VInputErrors :errors="[errors.returnDate, errors.returnTime]" />
 		</div>
 
 		<label class="text-right" for="notes">Notas</label>
 
-		<div class="col-span-2">
-			<textarea
-				id="notes"
-				:class="[
-					'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-					'resize-y min-h-16 max-h-72 w-full',
-					errors['notes']
-						? 'border-chili-400 accent-chili-600'
-						: 'border-asparagus-100 accent-asparagus-600',
-				]"
-				name="notes"
-				placeholder="Quedé en volver para platicar sobre..."
-				rows="10"
-				maxlength="500"
-			></textarea>
-
-			<small class="text-chili-600" v-if="errors['notes']">
-				{{ errors["notes"] }}
-			</small>
-		</div>
+		<VTextarea
+			div-class="col-span-2"
+			id="notes"
+			class="resize-y min-h-16 max-h-72"
+			placeholder="Quedé en volver para platicar sobre..."
+			v-model="returnVisitForm.notes"
+			v-model:errors="errors.notes"
+		></VTextarea>
 
 		<RouterLink
 			class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"

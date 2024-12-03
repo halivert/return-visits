@@ -9,7 +9,7 @@ import {
 import { useAvailableTopics } from "@/return-visits/composables/useAvailableTopics"
 import { useUpdateReturnVisit } from "@/return-visits/queries/useUpdateReturnVisit"
 import { usePeopleQuery } from "@/people/queries/usePeople"
-import { useDeleteReturnVisit } from "../queries/useDeleteReturnVisit"
+import { useDeleteReturnVisit } from "@/return-visits/queries/useDeleteReturnVisit"
 
 const router = useRouter()
 
@@ -99,7 +99,7 @@ async function handleSubmit() {
 			notes: returnVisitForm.notes,
 		})
 
-		router.replace({ name: "PeopleShow", params: { id: personId.value } })
+		router.back()
 	} catch (e) {
 		console.info(e)
 	}
