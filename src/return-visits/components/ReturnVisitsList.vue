@@ -61,7 +61,7 @@ function getUrlDate(date: Date) {
 				</p>
 			</div>
 
-			<p v-if="returnVisit.notes" class="text-sm mt-3 whitespace-pre">
+			<p v-if="returnVisit.notes" class="text-sm mt-3 whitespace-pre-line">
 				{{ returnVisit.notes }}
 			</p>
 		</article>

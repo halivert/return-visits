@@ -147,7 +147,7 @@ function resetForm() {
 					Volver el {{ DAYS[returnDays[person.id] as number] }}
 				</small>
 
-				<p class="mt-5 whitespace-pre">{{ person.description }}</p>
+				<p class="mt-5 whitespace-pre-line">{{ person.description }}</p>
 			</article>
 		</div>
 	</div>

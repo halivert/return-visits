@@ -265,7 +265,7 @@ async function handleDeletePerson() {
 					</div>
 
 					<small
-						class="text-chili-600 whitespace-pre"
+						class="text-chili-600 whitespace-pre-line"
 						v-if="errors['location']"
 					>
 						{{ errors["location"] }}
