@@ -1,0 +1,1 @@
+import{J as t,g as u,B as n,z as i}from"./index-DMjtAVTl.js";import{r as o}from"./returnVisitsKeys-BjL7tDZc.js";function a(r,e={}){return t(()=>({...u(e),queryKey:o.list(r),queryFn:({queryKey:s})=>n("returnVisits","personId",s[2])}))}function y({personId:r,options:e}){return i(a(r,e))}export{y as u};
