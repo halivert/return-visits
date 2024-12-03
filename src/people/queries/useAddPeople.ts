@@ -54,7 +54,9 @@ export function useAddPeople() {
 			queryClient.setQueryData(peopleKeys.detail(person.id), person)
 
 			if (returnVisit) {
-				queryClient.invalidateQueries({ queryKey: returnVisitsKeys.all() })
+				queryClient.invalidateQueries({
+					queryKey: returnVisitsKeys.list(person.id),
+				})
 				queryClient.setQueryData(
 					returnVisitsKeys.detail(returnVisit.personId, returnVisit.date),
 					returnVisit

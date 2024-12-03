@@ -26,7 +26,14 @@ export function useDeletePerson({ id }: UseDeletePersonParams) {
 		}),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: peopleKeys.all() })
-			queryClient.invalidateQueries({ queryKey: returnVisitsKeys.all() })
+
+			queryClient.invalidateQueries({ queryKey: returnVisitsKeys.list(id) })
+
+			returnVisits.value?.forEach((returnVisit) => {
+				queryClient.invalidateQueries({
+					queryKey: returnVisitsKeys.detail(id, returnVisit.date),
+				})
+			})
 		},
 	})
 }
