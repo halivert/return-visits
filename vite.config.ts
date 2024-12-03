@@ -1,8 +1,8 @@
 import { VitePWA } from "vite-plugin-pwa"
+import { URL, fileURLToPath } from "url"
 import { defineConfig } from "vite"
 import basicSsl from "@vitejs/plugin-basic-ssl"
 import vue from "@vitejs/plugin-vue"
-import { URL, fileURLToPath } from "url"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -24,9 +24,9 @@ export default defineConfig({
 			},
 
 			manifest: {
-				name: "return-visits",
-				short_name: "return-visits",
-				description: "Track all your return visits locally",
+				name: "Revisitas",
+				short_name: "Revisitas",
+				description: "Lleva un registro de tus revisitas localmente",
 				theme_color: "#7FB069",
 			},
 

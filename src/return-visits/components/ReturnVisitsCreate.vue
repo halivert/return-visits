@@ -226,9 +226,9 @@ async function handleSubmit(event: Event) {
 						? 'border-chili-400 accent-chili-600'
 						: 'border-asparagus-100 accent-asparagus-600',
 				]"
-				rows="8"
 				name="notes"
-				maxlength="250"
+				rows="10"
+				maxlength="500"
 			></textarea>
 
 			<small class="text-chili-600" v-if="errors['notes']">
