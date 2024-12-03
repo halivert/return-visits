@@ -1,9 +1,9 @@
 import { MaybeRef, UnwrapRef } from "vue"
 import { computed, unref } from "@vue/reactivity"
 import { UseQueryOptions } from "@tanstack/vue-query"
-import { peopleKeys } from "./peopleKeys"
-import { getFromStore } from "../../db/useDatabase"
-import { Person } from "../../db/models/Person"
+import { peopleKeys } from "@/people/queries/peopleKeys"
+import { getFromStore } from "@/db/useDatabase"
+import { Person } from "@/db/models/Person"
 
 type QueryOptions = UseQueryOptions<
 	Person,

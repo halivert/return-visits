@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/vue-query"
-import { personReturnVisitsQuery } from "./personReturnVisitsQuery"
+import { personReturnVisitsQuery } from "@/return-visits/queries/personReturnVisitsQuery"
 
 interface UsePersonReturnVisitsParams {
 	personId: Parameters<typeof personReturnVisitsQuery>[0]

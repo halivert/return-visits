@@ -16,27 +16,37 @@ export function useAddPeople() {
 			person: Omit<Person, "id">
 			returnVisit?: Omit<ReturnVisit, "personId">
 		}): Promise<{ person: Person; returnVisit?: ReturnVisit }> => {
-			const newPersonId = await addToStore("people", person)
+			const newPerson: Omit<Person, "id"> = {
+				colony: person.colony.trim(),
+				name: person.name.trim(),
+				description: person.description.trim(),
+				location: person.location,
+			}
 
-			const newReturnVisitKey = returnVisit
-				? await addToStore("returnVisits", {
-						...returnVisit,
-						personId: newPersonId,
-				  })
+			const newPersonId = await addToStore("people", newPerson)
+
+			const newReturnVisit: ReturnVisit | undefined =
+				returnVisit && newPersonId != undefined
+					? {
+							personId: newPersonId,
+							date: returnVisit.date,
+							topic: returnVisit.topic.trim(),
+							returnDate: returnVisit.returnDate,
+							notes: returnVisit.notes?.trim(),
+					  }
+					: undefined
+
+			const newReturnVisitKey = newReturnVisit
+				? await addToStore("returnVisits", newReturnVisit)
 				: undefined
 
 			return {
 				person: {
 					id: newPersonId,
-					...person,
+					...newPerson,
 				},
-				...(newReturnVisitKey
-					? {
-							...returnVisit,
-							personId: newReturnVisitKey[0],
-							date: newReturnVisitKey[1],
-					  }
-					: {}),
+				returnVisit:
+					newReturnVisitKey && newReturnVisit ? newReturnVisit : undefined,
 			}
 		},
 		onSuccess: ({ person, returnVisit }) => {

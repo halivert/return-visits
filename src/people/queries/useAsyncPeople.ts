@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/vue-query"
-import { peopleQuery } from "./peopleQuery"
+import { peopleQuery } from "@/people/queries/peopleQuery"
 
 export function useAsyncPeople() {
 	const queryClient = useQueryClient()

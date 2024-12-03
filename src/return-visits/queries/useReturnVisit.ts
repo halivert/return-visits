@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/vue-query"
 import { MaybeRef } from "vue"
-import { returnVisitsKeys } from "./returnVisitsKeys"
+import { returnVisitsKeys } from "@/return-visits/queries/returnVisitsKeys"
 import { getFromStore } from "@/db/useDatabase"
 
 interface UseReturnVisitParams {

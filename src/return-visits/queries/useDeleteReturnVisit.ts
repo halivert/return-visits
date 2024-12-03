@@ -1,7 +1,7 @@
 import { computed, MaybeRef, unref } from "vue"
 import { useMutation, useQueryClient } from "@tanstack/vue-query"
 import { deleteFromStore } from "@/db/useDatabase"
-import { returnVisitsKeys } from "./returnVisitsKeys"
+import { returnVisitsKeys } from "@/return-visits/queries/returnVisitsKeys"
 
 interface UseDeleteReturnVisitParams {
 	personId: MaybeRef<number>

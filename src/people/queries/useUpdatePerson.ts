@@ -21,19 +21,20 @@ export function useUpdatePerson({ id }: UseUpdatePersonParams) {
 						return Promise.reject(new Error("Original no encontrado"))
 					}
 
+					const original = originalPerson.value
+
 					const data: Person = {
-						id: originalPerson.value.id,
-						name: originalPerson.value.name,
-						colony: originalPerson.value.colony,
-						description: originalPerson.value.description,
-						location: originalPerson.value.location
+						id: original.id,
+						name: (person.name ?? original.name).trim(),
+						colony: (person.colony ?? original.colony).trim(),
+						description: (person.description ?? original.description).trim(),
+						location: original.location
 							? {
-									latitude: originalPerson.value.location.latitude,
-									longitude: originalPerson.value.location.longitude,
-									altitude: originalPerson.value.location.altitude,
+									latitude: original.location.latitude,
+									longitude: original.location.longitude,
+									altitude: original.location.altitude,
 							  }
 							: undefined,
-						...person,
 					}
 
 					const personId = await updateInStore("people", unref(id), data)

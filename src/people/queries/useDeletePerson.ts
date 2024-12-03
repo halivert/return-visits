@@ -1,7 +1,7 @@
 import { computed, MaybeRef, unref } from "vue"
 import { useMutation, useQueryClient } from "@tanstack/vue-query"
 import { deleteFromStore } from "@/db/useDatabase"
-import { peopleKeys } from "./peopleKeys"
+import { peopleKeys } from "@/people/queries/peopleKeys"
 import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
 import { returnVisitsKeys } from "@/return-visits/queries/returnVisitsKeys"
 

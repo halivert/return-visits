@@ -6,5 +6,6 @@ export function useReturnVisits() {
 	return useQuery({
 		queryKey: returnVisitsKeys.all(),
 		queryFn: () => getAllFromStore("returnVisits"),
+		staleTime: 0,
 	})
 }

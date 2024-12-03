@@ -1,9 +1,9 @@
 import { MaybeRef, UnwrapRef } from "vue"
 import { computed, unref } from "@vue/reactivity"
 import { UseQueryOptions } from "@tanstack/vue-query"
-import { getAllFromStore } from "../../db/useDatabase"
-import { returnVisitsKeys } from "./returnVisitsKeys"
-import { ReturnVisit } from "../models/ReturnVisit"
+import { getAllFromStore } from "@/db/useDatabase"
+import { returnVisitsKeys } from "@/return-visits/queries/returnVisitsKeys"
+import { ReturnVisit } from "@/return-visits/models/ReturnVisit"
 
 type QueryOptions = UseQueryOptions<
 	ReturnVisit[],

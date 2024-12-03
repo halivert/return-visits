@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/vue-query"
-import { personQuery } from "./personQuery"
+import { personQuery } from "@/people/queries/personQuery"
 
 interface UsePersonParams {
 	id: Parameters<typeof personQuery>[0]

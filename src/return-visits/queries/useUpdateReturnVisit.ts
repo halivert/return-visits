@@ -25,9 +25,14 @@ export function useUpdateReturnVisit({
 						return Promise.reject(new Error("Revisita no encontrada"))
 					}
 
+					const original = originalReturnVisit.value
+
 					const data: ReturnVisit = {
-						...originalReturnVisit.value,
-						...returnVisit,
+						personId: returnVisit.personId ?? original.personId,
+						date: returnVisit.date ?? original.date,
+						topic: (returnVisit.topic ?? original.topic).trim(),
+						returnDate: returnVisit.returnDate ?? original.returnDate,
+						notes: (returnVisit.notes ?? original.notes)?.trim(),
 					}
 
 					/**
