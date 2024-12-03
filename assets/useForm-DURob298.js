@@ -1,0 +1,1 @@
+import{K as s,k as t,v as u}from"./index-CRgsI8ii.js";function n(){const e=s();return t(()=>{var r;return new Set((r=e.data.value)==null?void 0:r.map(({colony:o})=>o))})}function p(e){return u({...e,errors:{}})}export{p as a,n as u};
