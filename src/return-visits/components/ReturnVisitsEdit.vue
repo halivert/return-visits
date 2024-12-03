@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from "vue"
+import { computed, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useReturnVisit } from "@/return-visits/queries/useReturnVisit"
 import {
@@ -14,8 +14,7 @@ import VInputErrors from "@/components/form/VInputErrors.vue"
 import VInput from "@/components/form/VInput.vue"
 import VTextarea from "@/components/form/VTextarea.vue"
 import VSelect from "@/components/form/VSelect.vue"
-
-type Errors<T> = Partial<Record<keyof T, string>>
+import { useForm } from "@/components/form/useForm"
 
 const router = useRouter()
 
@@ -36,7 +35,7 @@ const availableTopics = useAvailableTopics()
 const peopleQuery = usePeopleQuery()
 const availablePeople = computed(() => peopleQuery.data.value ?? [])
 
-const returnVisitForm = reactive({
+const returnVisitForm = useForm({
 	personId: returnVisit.value?.personId,
 	topic: returnVisit.value?.topic,
 	date: getDateForInput(returnVisit.value?.date),
@@ -45,7 +44,6 @@ const returnVisitForm = reactive({
 	returnTime: getTimeForInput(returnVisit.value?.returnDate),
 	notes: returnVisit.value?.notes,
 })
-const errors = reactive<Errors<typeof returnVisitForm>>({})
 
 watch(returnVisit, (returnVisit) => {
 	returnVisitForm.personId = returnVisit?.personId
@@ -68,28 +66,30 @@ async function handleDeleteReturnVisit() {
 }
 
 async function handleSubmit() {
+	if (updateReturnVisit.isPending.value) return
+
 	if (!returnVisitForm.personId) {
-		errors.personId = "Elige a la persona"
+		returnVisitForm.errors.personId = "Elige a la persona"
 	}
 
 	if (!returnVisitForm.topic) {
-		errors.topic = "Falta tema"
+		returnVisitForm.errors.topic = "Falta tema"
 	}
 
 	if (!returnVisitForm.date) {
-		errors.date = "Falta fecha"
+		returnVisitForm.errors.date = "Falta fecha"
 	}
 
 	if (!returnVisitForm.time) {
-		errors.time = "Falta hora"
+		returnVisitForm.errors.time = "Falta hora"
 	}
 
 	if (!returnVisitForm.returnDate) {
-		errors.returnDate = "Falta fecha de revisita"
+		returnVisitForm.errors.returnDate = "Falta fecha de revisita"
 	}
 
 	if (!returnVisitForm.returnTime) {
-		errors.returnTime = "Falta hora de revisita"
+		returnVisitForm.errors.returnTime = "Falta hora de revisita"
 	}
 
 	const date = new Date(returnVisitForm.date + "T" + returnVisitForm.time)
@@ -98,11 +98,11 @@ async function handleSubmit() {
 	)
 
 	if (date.getTime() > returnDate.getTime()) {
-		errors.returnDate =
+		returnVisitForm.errors.returnDate =
 			"Fecha de revisita tiene que ser posterior a fecha de visita"
 	}
 
-	if (Object.values(errors).some(Boolean)) return
+	if (Object.values(returnVisitForm.errors).some(Boolean)) return
 
 	try {
 		await updateReturnVisit.mutateAsync({
@@ -116,6 +116,7 @@ async function handleSubmit() {
 		router.back()
 	} catch (e) {
 		console.info(e)
+		alert("Error guardando los datos\nPor favor intenta de nuevo")
 	}
 }
 </script>
@@ -135,10 +136,10 @@ async function handleSubmit() {
 				<label class="text-right" for="personId">Persona</label>
 
 				<VSelect
-					div-class="col-span-2"
 					id="personId"
+					div-class="col-span-2"
 					v-model="returnVisitForm.personId"
-					:errors="errors.personId"
+					v-model:errors="returnVisitForm.errors.personId"
 				>
 					<option
 						v-for="person in availablePeople"
@@ -163,7 +164,7 @@ async function handleSubmit() {
 						div-class="flex-1"
 						type="date"
 						v-model="returnVisitForm.date"
-						v-model:errors="errors.date"
+						v-model:errors="returnVisitForm.errors.date"
 						hide-errors
 						required
 					/>
@@ -173,13 +174,15 @@ async function handleSubmit() {
 						div-class="flex-1"
 						type="time"
 						v-model="returnVisitForm.time"
-						v-model:errors="errors.time"
+						v-model:errors="returnVisitForm.errors.time"
 						hide-errors
 						required
 					/>
 				</div>
 
-				<VInputErrors :errors="[errors.date, errors.time]" />
+				<VInputErrors
+					:errors="[returnVisitForm.errors.date, returnVisitForm.errors.time]"
+				/>
 			</div>
 
 			<label class="text-right" for="topic">Tema</label>
@@ -188,7 +191,7 @@ async function handleSubmit() {
 				id="topic"
 				div-class="col-span-2"
 				v-model="returnVisitForm.topic"
-				v-model:errors="errors.topic"
+				v-model:errors="returnVisitForm.errors.topic"
 				:list="availableTopics"
 				required
 			/>
@@ -207,7 +210,7 @@ async function handleSubmit() {
 						div-class="flex-1"
 						type="date"
 						v-model="returnVisitForm.returnDate"
-						v-model:errors="errors.returnDate"
+						v-model:errors="returnVisitForm.errors.returnDate"
 						:min="returnVisitForm.date"
 						hide-errors
 						required
@@ -218,13 +221,18 @@ async function handleSubmit() {
 						div-class="flex-1"
 						type="time"
 						v-model="returnVisitForm.returnTime"
-						v-model:errors="errors.returnTime"
+						v-model:errors="returnVisitForm.errors.returnTime"
 						hide-errors
 						required
 					/>
 				</div>
 
-				<VInputErrors :errors="[errors.returnDate, errors.returnTime]" />
+				<VInputErrors
+					:errors="[
+						returnVisitForm.errors.returnDate,
+						returnVisitForm.errors.returnTime,
+					]"
+				/>
 			</div>
 
 			<label class="text-right" for="notes">Notas</label>
@@ -234,7 +242,7 @@ async function handleSubmit() {
 				id="notes"
 				class="resize-y min-h-16 max-h-72"
 				v-model="returnVisitForm.notes"
-				v-model:errors="errors.notes"
+				v-model:errors="returnVisitForm.errors.notes"
 			/>
 
 			<RouterLink

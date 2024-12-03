@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from "vue"
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useAddReturnVisit } from "@/return-visits/queries/useAddReturnVisit"
 import {
@@ -10,8 +10,7 @@ import VInput from "@/components/form/VInput.vue"
 import VTextarea from "@/components/form/VTextarea.vue"
 import { useAvailableTopics } from "@/return-visits/composables/useAvailableTopics"
 import VInputErrors from "@/components/form/VInputErrors.vue"
-
-type Errors<T> = Partial<Record<keyof T, string>>
+import { useForm } from "@/components/form/useForm"
 
 const router = useRouter()
 
@@ -27,7 +26,7 @@ const availableTopics = useAvailableTopics()
 const now = new Date()
 const sevenDaysAfter = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
-const returnVisitForm = reactive({
+const returnVisitForm = useForm({
 	date: getDateForInput(now),
 	time: getTimeForInput(now),
 	topic: "",
@@ -36,27 +35,25 @@ const returnVisitForm = reactive({
 	notes: "",
 })
 
-const errors = reactive<Errors<typeof returnVisitForm>>({})
-
 async function handleSubmit() {
 	if (!returnVisitForm.date) {
-		errors.date = "Falta fecha"
+		returnVisitForm.errors.date = "Falta fecha"
 	}
 
 	if (!returnVisitForm.time) {
-		errors.time = "Falta hora"
+		returnVisitForm.errors.time = "Falta hora"
 	}
 
 	if (!returnVisitForm.topic) {
-		errors.topic = "Falta tema"
+		returnVisitForm.errors.topic = "Falta tema"
 	}
 
 	if (!returnVisitForm.returnDate) {
-		errors.returnDate = "Falta fecha de revisita"
+		returnVisitForm.errors.returnDate = "Falta fecha de revisita"
 	}
 
 	if (!returnVisitForm.returnTime) {
-		errors.returnTime = "Falta hora de revisita"
+		returnVisitForm.errors.returnTime = "Falta hora de revisita"
 	}
 
 	const date = new Date(returnVisitForm.date + "T" + returnVisitForm.time)
@@ -65,11 +62,11 @@ async function handleSubmit() {
 	)
 
 	if (date.getTime() > returnDate.getTime()) {
-		errors.returnDate =
+		returnVisitForm.errors.returnDate =
 			"Fecha de revisita tiene que ser posterior a fecha de visita"
 	}
 
-	if (Object.values(errors).some(Boolean)) {
+	if (Object.values(returnVisitForm.errors).some(Boolean)) {
 		return
 	}
 
@@ -83,7 +80,8 @@ async function handleSubmit() {
 
 		router.back()
 	} catch (error) {
-		errors.time = error instanceof Error ? error.message : "Error desconocido"
+		returnVisitForm.errors.time =
+			error instanceof Error ? error.message : "Error desconocido"
 	}
 }
 </script>
@@ -103,7 +101,7 @@ async function handleSubmit() {
 					id="date"
 					type="date"
 					v-model="returnVisitForm.date"
-					v-model:errors="errors.date"
+					v-model:errors="returnVisitForm.errors.date"
 					hide-errors
 					required
 				/>
@@ -113,13 +111,15 @@ async function handleSubmit() {
 					id="time"
 					type="time"
 					v-model="returnVisitForm.time"
-					v-model:errors="errors.time"
+					v-model:errors="returnVisitForm.errors.time"
 					hide-errors
 					required
 				/>
 			</div>
 
-			<VInputErrors :errors="[errors.date, errors.time]" />
+			<VInputErrors
+				:errors="[returnVisitForm.errors.date, returnVisitForm.errors.time]"
+			/>
 		</div>
 
 		<label class="text-right" for="topic">Tema</label>
@@ -128,7 +128,7 @@ async function handleSubmit() {
 			div-class="col-span-2"
 			id="topic"
 			v-model="returnVisitForm.topic"
-			v-model:errors="errors.topic"
+			v-model:errors="returnVisitForm.errors.topic"
 			placeholder="En esta visita hablamos de..."
 			list="topicDataList"
 			required
@@ -155,7 +155,7 @@ async function handleSubmit() {
 					type="date"
 					v-model="returnVisitForm.returnDate"
 					:min="returnVisitForm.date"
-					v-model:errors="errors.returnDate"
+					v-model:errors="returnVisitForm.errors.returnDate"
 					hide-errors
 					required
 				/>
@@ -165,13 +165,18 @@ async function handleSubmit() {
 					div-class="flex-1"
 					type="time"
 					v-model="returnVisitForm.returnTime"
-					v-model:errors="errors.returnTime"
+					v-model:errors="returnVisitForm.errors.returnTime"
 					hide-errors
 					required
 				/>
 			</div>
 
-			<VInputErrors :errors="[errors.returnDate, errors.returnTime]" />
+			<VInputErrors
+				:errors="[
+					returnVisitForm.errors.returnDate,
+					returnVisitForm.errors.returnTime,
+				]"
+			/>
 		</div>
 
 		<label class="text-right" for="notes">Notas</label>
@@ -182,7 +187,7 @@ async function handleSubmit() {
 			class="resize-y min-h-16 max-h-72"
 			placeholder="Quedé en volver para platicar sobre..."
 			v-model="returnVisitForm.notes"
-			v-model:errors="errors.notes"
+			v-model:errors="returnVisitForm.errors.notes"
 		></VTextarea>
 
 		<RouterLink
