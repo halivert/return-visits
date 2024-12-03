@@ -1,0 +1,1 @@
+import{C as i,r as a,K as l,x as o,i as s}from"./index-FdRT-eED.js";function f(){return i({queryKey:a.all(),queryFn:()=>l("returnVisits")})}function m({personId:r}={}){const n=f();return o(()=>{var t,u;return new Set((u=(t=n.data.value)==null?void 0:t.filter(e=>s(r)==null?!0:e.personId===s(r)))==null?void 0:u.map(({topic:e})=>e))})}export{m as u};
