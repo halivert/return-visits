@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { HTMLAttributes, InputHTMLAttributes } from "vue"
-import VInputErrors from "./VInputErrors.vue"
+import VInputErrors from "@/components/form/VInputErrors.vue"
 
 defineOptions({ inheritAttrs: false })
 
@@ -10,6 +10,7 @@ withDefaults(
 		type?: InputHTMLAttributes["type"]
 		divClass?: HTMLAttributes["class"]
 		hideErrors?: boolean
+		list?: Iterable<string>
 	}>(),
 	{
 		type: "text",
@@ -34,8 +35,15 @@ const errors = defineModel<string>("errors")
 					: 'border-asparagus-100 accent-asparagus-600',
 			]"
 			v-model="model"
+			:list="list ? `${id}List` : undefined"
 			@change="errors = ''"
 		/>
+
+		<datalist v-if="list" :id="`${id}List`">
+			<option v-for="item in list" :key="item">
+				{{ item }}
+			</option>
+		</datalist>
 
 		<VInputErrors v-if="!hideErrors" :errors="errors" />
 	</div>

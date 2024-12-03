@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue"
+import { computed, reactive, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useReturnVisit } from "@/return-visits/queries/useReturnVisit"
 import {
@@ -10,6 +10,12 @@ import { useAvailableTopics } from "@/return-visits/composables/useAvailableTopi
 import { useUpdateReturnVisit } from "@/return-visits/queries/useUpdateReturnVisit"
 import { usePeopleQuery } from "@/people/queries/usePeople"
 import { useDeleteReturnVisit } from "@/return-visits/queries/useDeleteReturnVisit"
+import VInputErrors from "@/components/form/VInputErrors.vue"
+import VInput from "@/components/form/VInput.vue"
+import VTextarea from "@/components/form/VTextarea.vue"
+import VSelect from "@/components/form/VSelect.vue"
+
+type Errors<T> = Partial<Record<keyof T, string>>
 
 const router = useRouter()
 
@@ -30,7 +36,6 @@ const availableTopics = useAvailableTopics()
 const peopleQuery = usePeopleQuery()
 const availablePeople = computed(() => peopleQuery.data.value ?? [])
 
-const errors = ref<Record<string, string>>({})
 const returnVisitForm = reactive({
 	personId: returnVisit.value?.personId,
 	topic: returnVisit.value?.topic,
@@ -40,6 +45,7 @@ const returnVisitForm = reactive({
 	returnTime: getTimeForInput(returnVisit.value?.returnDate),
 	notes: returnVisit.value?.notes,
 })
+const errors = reactive<Errors<typeof returnVisitForm>>({})
 
 watch(returnVisit, (returnVisit) => {
 	returnVisitForm.personId = returnVisit?.personId
@@ -63,39 +69,47 @@ async function handleDeleteReturnVisit() {
 
 async function handleSubmit() {
 	if (!returnVisitForm.personId) {
-		errors.value = { ...errors.value, personId: "Elige a la persona" }
+		errors.personId = "Elige a la persona"
 	}
 
 	if (!returnVisitForm.topic) {
-		errors.value = { ...errors.value, topic: "Falta tema" }
+		errors.topic = "Falta tema"
 	}
 
 	if (!returnVisitForm.date) {
-		errors.value = { ...errors.value, date: "Falta fecha" }
+		errors.date = "Falta fecha"
 	}
 
 	if (!returnVisitForm.time) {
-		errors.value = { ...errors.value, time: "Falta hora" }
+		errors.time = "Falta hora"
 	}
 
 	if (!returnVisitForm.returnDate) {
-		errors.value = { ...errors.value, returnDate: "Falta fecha de revisita" }
+		errors.returnDate = "Falta fecha de revisita"
 	}
 
 	if (!returnVisitForm.returnTime) {
-		errors.value = { ...errors.value, returnTime: "Falta hora de revisita" }
+		errors.returnTime = "Falta hora de revisita"
 	}
 
-	if (Object.values(errors.value).some(Boolean)) return
+	const date = new Date(returnVisitForm.date + "T" + returnVisitForm.time)
+	const returnDate = new Date(
+		returnVisitForm.returnDate + "T" + returnVisitForm.returnTime
+	)
+
+	if (date.getTime() > returnDate.getTime()) {
+		errors.returnDate =
+			"Fecha de revisita tiene que ser posterior a fecha de visita"
+	}
+
+	if (Object.values(errors).some(Boolean)) return
 
 	try {
 		await updateReturnVisit.mutateAsync({
 			personId: returnVisitForm.personId,
-			date: new Date(returnVisitForm.date + "T" + returnVisitForm.time),
+			date,
 			topic: returnVisitForm.topic,
-			returnDate: new Date(
-				returnVisitForm.returnDate + "T" + returnVisitForm.returnTime
-			),
+			returnDate,
 			notes: returnVisitForm.notes,
 		})
 
@@ -120,30 +134,20 @@ async function handleSubmit() {
 			<template v-if="availablePeople.length > 1">
 				<label class="text-right" for="personId">Persona</label>
 
-				<div class="col-span-2">
-					<select
-						id="personId"
-						:class="[
-							'w-full h-8 px-2 py-1 border dark:text-lemon-50',
-							errors['personId']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
-						v-model="returnVisitForm.personId"
+				<VSelect
+					div-class="col-span-2"
+					id="personId"
+					v-model="returnVisitForm.personId"
+					:errors="errors.personId"
+				>
+					<option
+						v-for="person in availablePeople"
+						:key="person.id"
+						:value="person.id"
 					>
-						<option
-							v-for="person in availablePeople"
-							:key="person.id"
-							:value="person.id"
-						>
-							{{ person.name }}
-						</option>
-					</select>
-
-					<small class="text-chili-600" v-if="errors['personId']">
-						{{ errors["personId"] }}
-					</small>
-				</div>
+						{{ person.name }}
+					</option>
+				</VSelect>
 			</template>
 
 			<div class="text-right">
@@ -154,75 +158,40 @@ async function handleSubmit() {
 
 			<div class="col-span-2">
 				<div class="flex flex-wrap gap-2">
-					<input
+					<VInput
 						id="date"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['date']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="date"
-						name="date"
 						v-model="returnVisitForm.date"
-						@input="errors['date'] = ''"
+						v-model:errors="errors.date"
+						hide-errors
 						required
 					/>
 
-					<input
+					<VInput
 						id="time"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['time']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="time"
-						name="time"
 						v-model="returnVisitForm.time"
-						@input="errors['time'] = ''"
+						v-model:errors="errors.time"
+						hide-errors
 						required
 					/>
 				</div>
 
-				<small class="text-chili-600" v-if="errors['date'] || errors['time']">
-					{{ errors["date"] }} <br v-if="errors['date'] && errors['time']" />
-					{{ errors["time"] }}
-				</small>
+				<VInputErrors :errors="[errors.date, errors.time]" />
 			</div>
 
 			<label class="text-right" for="topic">Tema</label>
 
-			<div class="col-span-2">
-				<input
-					id="topic"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 w-full',
-						errors['topic']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					type="string"
-					name="topic"
-					v-model="returnVisitForm.topic"
-					@input="errors['topic'] = ''"
-					list="topicDataList"
-					required
-				/>
-
-				<small class="text-chili-600" v-if="errors['topic']">
-					{{ errors["topic"] }}
-				</small>
-
-				<datalist id="topicDataList">
-					<option v-for="topic in availableTopics" :key="topic">
-						{{ topic }}
-					</option>
-				</datalist>
-			</div>
+			<VInput
+				id="topic"
+				div-class="col-span-2"
+				v-model="returnVisitForm.topic"
+				v-model:errors="errors.topic"
+				:list="availableTopics"
+				required
+			/>
 
 			<div class="text-right">
 				<label for="returnDate">Fecha</label>
@@ -233,71 +202,40 @@ async function handleSubmit() {
 
 			<div class="col-span-2">
 				<div class="flex flex-wrap gap-2">
-					<input
+					<VInput
 						id="returnDate"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['returnDate']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="date"
-						name="returnDate"
 						v-model="returnVisitForm.returnDate"
+						v-model:errors="errors.returnDate"
 						:min="returnVisitForm.date"
-						@change="errors['returnDate'] = ''"
+						hide-errors
 						required
 					/>
 
-					<input
+					<VInput
 						id="returnTime"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['returnTime']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="time"
-						name="returnTime"
 						v-model="returnVisitForm.returnTime"
-						@input="errors['returnTime'] = ''"
+						v-model:errors="errors.returnTime"
+						hide-errors
 						required
 					/>
 				</div>
-				<small
-					class="text-chili-600"
-					v-if="errors['returnDate'] || errors['returnTime']"
-				>
-					{{ errors["returnDate"] }}
-					<br v-if="errors['returnDate'] && errors['returnTime']" />
-					{{ errors["returnTime"] }}
-				</small>
+
+				<VInputErrors :errors="[errors.returnDate, errors.returnTime]" />
 			</div>
 
 			<label class="text-right" for="notes">Notas</label>
 
-			<div class="col-span-2">
-				<textarea
-					id="notes"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'resize-y min-h-16 max-h-72 w-full',
-						errors['notes']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					v-model="returnVisitForm.notes"
-					name="notes"
-					rows="10"
-					maxlength="500"
-				></textarea>
-
-				<small class="text-chili-600" v-if="errors['notes']">
-					{{ errors["notes"] }}
-				</small>
-			</div>
+			<VTextarea
+				div-class="col-span-2"
+				id="notes"
+				class="resize-y min-h-16 max-h-72"
+				v-model="returnVisitForm.notes"
+				v-model:errors="errors.notes"
+			/>
 
 			<RouterLink
 				class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"
