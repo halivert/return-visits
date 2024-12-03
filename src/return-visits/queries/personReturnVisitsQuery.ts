@@ -20,7 +20,16 @@ export function personReturnVisitsQuery(
 	return computed(() => ({
 		...unref(options),
 		queryKey: returnVisitsKeys.list(personId),
-		queryFn: ({ queryKey }) =>
-			getAllFromStore("returnVisits", "personId", queryKey[2]),
+		queryFn: async ({ queryKey }) => {
+			const returnVisits = await getAllFromStore(
+				"returnVisits",
+				"personId",
+				queryKey[2]
+			)
+
+			return returnVisits.toSorted(
+				(a, b) => b.date.getTime() - a.date.getTime()
+			)
+		},
 	}))
 }

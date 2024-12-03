@@ -6,16 +6,11 @@ const props = defineProps<{
 	id: number
 }>()
 
-const id = computed(() => props.id)
+const personId = computed(() => props.id)
 
-const returnVisitsQuery = usePersonReturnVisits({ personId: id })
+const returnVisitsQuery = usePersonReturnVisits({ personId })
 
-const returnVisits = computed(
-	() =>
-		returnVisitsQuery.data.value?.toSorted((a, b) => {
-			return b.date.getTime() - a.date.getTime()
-		})
-)
+const returnVisits = computed(() => returnVisitsQuery.data.value)
 
 function getDatetime(date: Date) {
 	return Intl.DateTimeFormat("es-MX", {
@@ -42,7 +37,7 @@ function getUrlDate(date: Date) {
 					:to="{
 						name: 'PeopleReturnVisitsEdit',
 						params: {
-							id: id,
+							id: personId,
 							date: getUrlDate(returnVisit.date),
 						},
 					}"

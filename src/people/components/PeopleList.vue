@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
+import { useQueries } from "@tanstack/vue-query"
 import { usePeopleQuery } from "@/people/queries/usePeople"
 import { DAYS } from "@/constants"
+import { personReturnVisitsQuery } from "@/return-visits/queries/personReturnVisitsQuery"
 
 const peopleQuery = usePeopleQuery()
 
@@ -14,7 +16,29 @@ const showFilters = computed(() => {
 	return peopleQuery.data.value.length > 1
 })
 
-const days = computed(() => [])
+const returnVisitsQueries = useQueries({
+	queries: computed(
+		() =>
+			peopleQuery.data.value?.map(({ id }) => personReturnVisitsQuery(id)) ?? []
+	),
+})
+
+const days = computed(
+	() =>
+		new Set(
+			returnVisitsQueries.value
+				.flatMap(({ data }) => data?.at(0)?.date.getDay())
+				.filter((day) => day != undefined)
+		)
+)
+
+const returnDays = computed<Record<number, number | undefined>>(() =>
+	Object.fromEntries(
+		returnVisitsQueries.value
+			.filter(({ data }) => !!data?.at(0)?.personId)
+			.map(({ data }) => [data?.at(0)?.personId, data?.at(0)?.date.getDay()])
+	)
+)
 
 const colonies = computed(
 	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony))
@@ -22,13 +46,16 @@ const colonies = computed(
 
 const people = computed(
 	() =>
-		peopleQuery.data.value?.filter((people) => {
+		peopleQuery.data.value?.filter((person) => {
 			if (selectedDays.value.length) {
-				// if (!selectedDays.value.includes(people.returnDay)) return false
+				const returnDay = returnDays.value[person.id]
+
+				if (returnDay != undefined && !selectedDays.value.includes(returnDay))
+					return false
 			}
 
 			if (selectedColonies.value.length) {
-				if (!selectedColonies.value.includes(people.colony)) return false
+				if (!selectedColonies.value.includes(person.colony)) return false
 			}
 
 			return true
@@ -113,7 +140,9 @@ function resetForm() {
 
 				<h3>{{ person.colony }}</h3>
 
-				<!-- <small>Volver el {{ DAYS[person.returnDay] }}</small> -->
+				<small v-if="returnDays[person.id] !== undefined">
+					Volver el {{ DAYS[returnDays[person.id] as number] }}
+				</small>
 
 				<p class="mt-5">
 					{{ person.description }}
