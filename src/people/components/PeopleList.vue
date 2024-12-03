@@ -27,7 +27,7 @@ const days = computed(
 	() =>
 		new Set(
 			returnVisitsQueries.value
-				.flatMap(({ data }) => data?.at(0)?.date.getDay())
+				.flatMap(({ data }) => data?.at(0)?.returnDate.getDay())
 				.filter((day) => day != undefined)
 		)
 )
