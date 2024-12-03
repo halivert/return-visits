@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue"
+import { watch } from "vue"
 import { useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
 import { useAddPeople } from "@/people/queries/useAddPeople"
@@ -9,6 +9,10 @@ import {
 	getDateForInput,
 	getTimeForInput,
 } from "@/return-visits/composables/getDateTimeForInput"
+import { useForm } from "@/components/form/useForm"
+import VInput from "@/components/form/VInput.vue"
+import VTextarea from "@/components/form/VTextarea.vue"
+import VInputErrors from "@/components/form/VInputErrors.vue"
 
 const router = useRouter()
 const colonies = useColonies()
@@ -17,15 +21,14 @@ const availableTopics = useAvailableTopics()
 
 const addPersonMutation = useAddPeople()
 
-const errors = ref<Record<string, string>>({})
-
 const now = new Date()
 
-const addPersonForm = reactive({
+const addPersonForm = useForm({
 	name: "",
 	colony: "",
 	description: "",
 	addLocation: false,
+	location: undefined,
 
 	// Return visit data
 	date: getDateForInput(now),
@@ -39,7 +42,8 @@ const addPersonForm = reactive({
 })
 
 async function addPerson(coords?: Omit<GeolocationCoordinates, "toJSON">) {
-	if (Object.values(errors.value).some((error) => error)) return
+	if (addPersonMutation.isPending.value) return
+	if (Object.values(addPersonForm.errors).some(Boolean)) return
 
 	try {
 		await addPersonMutation.mutateAsync({
@@ -65,7 +69,7 @@ async function addPerson(coords?: Omit<GeolocationCoordinates, "toJSON">) {
 			},
 		})
 
-		router.replace("/")
+		router.back()
 	} catch (e) {
 		console.info(e)
 		alert("Error guardando los datos\nPor favor intenta de nuevo")
@@ -76,31 +80,31 @@ function handleSubmit() {
 	if (addPersonMutation.isPending.value) return
 
 	if (!addPersonForm.name) {
-		errors.value = { ...errors.value, name: "Falta nombre" }
+		addPersonForm.errors.name = "Falta nombre"
 	}
 
 	if (!addPersonForm.colony) {
-		errors.value = { ...errors.value, colony: "Falta colonia" }
+		addPersonForm.errors.colony = "Falta colonia"
 	}
 
 	if (!addPersonForm.date) {
-		errors.value = { ...errors.value, date: "Falta fecha" }
+		addPersonForm.errors.date = "Falta fecha"
 	}
 
 	if (!addPersonForm.time) {
-		errors.value = { ...errors.value, time: "Falta hora" }
+		addPersonForm.errors.time = "Falta hora"
 	}
 
 	if (!addPersonForm.topic) {
-		errors.value = { ...errors.value, topic: "Falta tema" }
+		addPersonForm.errors.topic = "Falta tema"
 	}
 
 	if (!addPersonForm.returnDate) {
-		errors.value = { ...errors.value, returnDate: "Falta fecha de revisita" }
+		addPersonForm.errors.returnDate = "Falta fecha de revisita"
 	}
 
 	if (!addPersonForm.returnTime) {
-		errors.value = { ...errors.value, returnTime: "Falta hora de revisita" }
+		addPersonForm.errors.returnTime = "Falta hora de revisita"
 	}
 
 	const date = new Date(addPersonForm.date + "T" + addPersonForm.time)
@@ -109,10 +113,8 @@ function handleSubmit() {
 	)
 
 	if (date.getTime() > returnDate.getTime()) {
-		errors.value = {
-			...errors.value,
-			returnDate: "Fecha de revisita tiene que ser posterior a fecha de visita",
-		}
+		addPersonForm.errors.returnDate =
+			"Fecha de revisita tiene que ser posterior a fecha de visita"
 	}
 
 	if (addPersonForm.addLocation) {
@@ -122,10 +124,7 @@ function handleSubmit() {
 			[geolocation.coords, geolocation.error],
 			([coords, error]) => {
 				if (error) {
-					errors.value = {
-						...errors.value,
-						location: "Error obteniendo la ubicación",
-					}
+					addPersonForm.errors.location = "Error obteniendo la ubicación"
 
 					return
 				}
@@ -149,109 +148,55 @@ function handleSubmit() {
 		<form class="grid grid-cols-3 gap-2 gap-y-3" @submit.prevent="handleSubmit">
 			<label class="text-right" for="name">Nombre</label>
 
-			<div class="col-span-2">
-				<input
-					id="name"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 w-full',
-						errors['name']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					type="text"
-					name="name"
-					v-model="addPersonForm.name"
-					placeholder="Saulo"
-					@input="errors['name'] = ''"
-					required
-				/>
-
-				<small class="text-chili-600" v-if="errors['name']">
-					{{ errors["name"] }}
-				</small>
-			</div>
+			<VInput
+				id="name"
+				div-class="col-span-2"
+				v-model="addPersonForm.name"
+				v-model:errors="addPersonForm.errors.name"
+				placeholder="Saulo"
+				required
+			/>
 
 			<label class="text-right" for="colony">Colonia</label>
 
-			<div class="col-span-2">
-				<input
-					id="colony"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 w-full',
-						errors['colony']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					type="text"
-					name="colony"
-					list="colonyList"
-					v-model="addPersonForm.colony"
-					placeholder="Tarso"
-					@input="errors['colony'] = ''"
-					required
-				/>
-
-				<small class="text-chili-600" v-if="errors['colony']">
-					{{ errors["colony"] }}
-				</small>
-
-				<datalist id="colonyList">
-					<option v-for="colony in colonies" :key="colony">{{ colony }}</option>
-				</datalist>
-			</div>
+			<VInput
+				id="colony"
+				div-class="col-span-2"
+				v-model="addPersonForm.colony"
+				v-model:errors="addPersonForm.errors.colony"
+				:list="colonies"
+				placeholder="Tarso"
+				required
+			/>
 
 			<label class="text-right" for="location">Ubicación</label>
 
-			<div class="col-span-2 self-center">
-				<input
-					type="checkbox"
-					id="location"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm',
-						errors['location']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					name="location"
-					v-model="addPersonForm.addLocation"
-				/>
-
-				<small class="text-chili-600" v-if="errors['location']">
-					{{ errors["location"] }}
-				</small>
-			</div>
+			<VInput
+				id="location"
+				div-class="col-span-2 self-center"
+				type="checkbox"
+				v-model="addPersonForm.addLocation"
+				v-model:errors="addPersonForm.errors.location"
+			/>
 
 			<label class="text-right" for="description">Descripción</label>
 
-			<div class="col-span-2">
-				<textarea
-					id="description"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'resize-y min-h-16 max-h-72 w-full',
-						errors['description']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					rows="8"
-					name="description"
-					v-model="addPersonForm.description"
-					:placeholder="
-						[
-							'Calle Recta, casa de Judas.\n',
-							'Israelita de la tribu de Benjamín',
-							'Estaba orando, no puede ver.',
-						].join('\n')
-					"
-					maxlength="250"
-				></textarea>
-
-				<small class="text-chili-600" v-if="errors['description']">
-					{{ errors["description"] }}
-				</small>
-			</div>
+			<VTextarea
+				id="description"
+				div-class="col-span-2"
+				class="resize-y min-h-16 max-h-72"
+				v-model="addPersonForm.description"
+				v-model:errors="addPersonForm.errors.description"
+				:placeholder="
+					[
+						'Calle Recta, casa de Judas.\n',
+						'Israelita de la tribu de Benjamín',
+						'Estaba orando, no puede ver.',
+					].join('\n')
+				"
+				rows="8"
+				maxlength="250"
+			/>
 
 			<div class="text-right">
 				<label for="date">Fecha</label>
@@ -261,75 +206,44 @@ function handleSubmit() {
 
 			<div class="col-span-2">
 				<div class="flex flex-wrap gap-2">
-					<input
+					<VInput
 						id="date"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['date']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="date"
-						name="date"
 						v-model="addPersonForm.date"
-						@input="errors['date'] = ''"
+						v-model:errors="addPersonForm.errors.date"
+						hide-errors
 						required
 					/>
 
-					<input
+					<VInput
 						id="time"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['time']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="time"
-						name="time"
 						v-model="addPersonForm.time"
-						@input="errors['time'] = ''"
+						v-model:errors="addPersonForm.errors.time"
+						hide-errors
 						required
 					/>
 				</div>
-				<small class="text-chili-600" v-if="errors['date'] || errors['time']">
-					{{ errors["date"] }} <br v-if="errors['date'] && errors['time']" />
-					{{ errors["time"] }}
-				</small>
+
+				<VInputErrors
+					:errors="[addPersonForm.errors.date, addPersonForm.errors.time]"
+				/>
 			</div>
 
 			<label class="text-right" for="topic">Tema</label>
 
-			<div class="col-span-2">
-				<input
-					id="topic"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'h-8 w-full',
-						errors['topic']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					type="string"
-					name="topic"
-					v-model="addPersonForm.topic"
-					@input="errors['topic'] = ''"
-					list="topicDataList"
-					placeholder="Visitar para devolver la vista"
-					required
-				/>
-
-				<small class="text-chili-600" v-if="errors['topic']">
-					{{ errors["topic"] }}
-				</small>
-
-				<datalist id="topicDataList">
-					<option v-for="topic in availableTopics" :key="topic">
-						{{ topic }}
-					</option>
-				</datalist>
-			</div>
+			<VInput
+				id="topic"
+				div-class="col-span-2"
+				name="topic"
+				v-model="addPersonForm.topic"
+				v-model:errors="addPersonForm.errors.topic"
+				:list="availableTopics"
+				placeholder="Visitar para devolver la vista"
+				required
+			/>
 
 			<div class="text-right">
 				<label for="returnDate">Fecha</label>
@@ -340,77 +254,51 @@ function handleSubmit() {
 
 			<div class="col-span-2">
 				<div class="flex flex-wrap gap-2">
-					<input
+					<VInput
 						id="returnDate"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['returnDate']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="date"
-						name="returnDate"
 						v-model="addPersonForm.returnDate"
+						v-model:errors="addPersonForm.errors.returnDate"
 						:min="addPersonForm.date"
-						@change="errors['returnDate'] = ''"
+						hide-errors
 						required
 					/>
 
-					<input
+					<VInput
 						id="returnTime"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 flex-1',
-							errors['returnTime']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
+						div-class="flex-1"
 						type="time"
-						name="returnTime"
 						v-model="addPersonForm.returnTime"
-						@input="errors['returnTime'] = ''"
+						v-model:errors="addPersonForm.errors.returnTime"
+						hide-errors
 						required
 					/>
 				</div>
-				<small
-					class="text-chili-600"
-					v-if="errors['returnDate'] || errors['returnTime']"
-				>
-					{{ errors["returnDate"] }}
-					<br v-if="errors['returnDate'] && errors['returnTime']" />
-					{{ errors["returnTime"] }}
-				</small>
+
+				<VInputErrors
+					:errors="[
+						addPersonForm.errors.returnDate,
+						addPersonForm.errors.returnTime,
+					]"
+				/>
 			</div>
 
 			<label class="text-right" for="notes">Notas</label>
 
-			<div class="col-span-2">
-				<textarea
-					id="notes"
-					:class="[
-						'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-						'resize-y min-h-16 max-h-72 w-full',
-						errors['notes']
-							? 'border-chili-400 accent-chili-600'
-							: 'border-asparagus-100 accent-asparagus-600',
-					]"
-					name="notes"
-					v-model="addPersonForm.notes"
-					:placeholder="
-						[
-							'Jesucristo me envió, no tengo muchas ganas de ir porque este hombre le ha hecho mucho daño a los santos en Jerusalén.\n',
-							'Jesús dice que es un instrumento para llevar su nombre a las naciones.',
-						].join('\n')
-					"
-					rows="10"
-					maxlength="500"
-				></textarea>
-
-				<small class="text-chili-600" v-if="errors['notes']">
-					{{ errors["notes"] }}
-				</small>
-			</div>
+			<VTextarea
+				id="notes"
+				div-class="col-span-2"
+				class="resize-y min-h-16 max-h-72"
+				v-model="addPersonForm.notes"
+				v-model:errors="addPersonForm.errors.notes"
+				:placeholder="
+					[
+						'Jesucristo me envió, no tengo muchas ganas de ir porque este hombre le ha hecho mucho daño a los santos en Jerusalén.\n',
+						'Jesús dice que es un instrumento para llevar su nombre a las naciones.',
+					].join('\n')
+				"
+			/>
 
 			<button
 				class="col-start-3 bg-asparagus-600 rounded px-2 py-1 text-lemon-50"

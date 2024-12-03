@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { HTMLAttributes, InputHTMLAttributes } from "vue"
+import { computed, HTMLAttributes, InputHTMLAttributes } from "vue"
 import VInputErrors from "@/components/form/VInputErrors.vue"
 
 defineOptions({ inheritAttrs: false })
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		id: string
 		type?: InputHTMLAttributes["type"]
@@ -19,17 +19,20 @@ withDefaults(
 
 const model = defineModel()
 const errors = defineModel<string>("errors")
+
+const isInline = computed(() => ["checkbox", "radio"].includes(props.type))
 </script>
 
 <template>
 	<div :class="divClass">
 		<input
+			:name="id"
 			v-bind="$attrs"
 			:id="id"
-			:name="id"
 			:type="type"
 			:class="[
-				'border rounded-sm h-8 block px-2 py-1 w-full max-w-full dark:text-lemon-50',
+				'border rounded-sm h-8 block px-2 py-1 dark:text-lemon-50',
+				{ 'w-full max-w-full': !isInline },
 				errors
 					? 'border-chili-400 accent-chili-600'
 					: 'border-asparagus-100 accent-asparagus-600',
