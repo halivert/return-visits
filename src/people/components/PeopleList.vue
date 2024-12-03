@@ -83,7 +83,7 @@ function resetForm() {
 						id="selectedColonies"
 						v-model="selectedColonies"
 						multiple
-						size="2"
+						size="3"
 					>
 						<option v-for="colony in colonies" :key="colony" class="truncate">
 							{{ colony }}
@@ -94,7 +94,7 @@ function resetForm() {
 				<label class="flex flex-col gap-1 col-span-2">
 					Día de vuelta
 
-					<VSelect id="selectedDays" v-model="selectedDays" multiple size="2">
+					<VSelect id="selectedDays" v-model="selectedDays" multiple size="3">
 						<option
 							v-for="day in days"
 							class="first-letter:uppercase truncate"
