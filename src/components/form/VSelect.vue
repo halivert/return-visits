@@ -8,6 +8,7 @@ defineProps<{
 	divClass?: HTMLAttributes["class"]
 	id: string
 	hideErrors?: boolean
+	multiple?: boolean
 }>()
 
 const model = defineModel()
@@ -17,14 +18,17 @@ const errors = defineModel<string>("errors")
 <template>
 	<div :class="divClass">
 		<select
+			v-bind="$attrs"
 			:id="id"
 			:name="id"
 			:class="[
-				'w-full h-8 px-2 py-1 border dark:text-lemon-50',
+				'w-full px-2 py-1 border dark:text-lemon-50',
+				{ 'h-8': !multiple },
 				errors
 					? 'border-chili-400 accent-chili-600'
 					: 'border-asparagus-100 accent-asparagus-600',
 			]"
+			:multiple="multiple"
 			v-model="model"
 			@change="errors = ''"
 		>

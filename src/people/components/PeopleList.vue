@@ -4,6 +4,7 @@ import { useQueries } from "@tanstack/vue-query"
 import { usePeopleQuery } from "@/people/queries/usePeople"
 import { DAYS } from "@/constants"
 import { personReturnVisitsQuery } from "@/return-visits/queries/personReturnVisitsQuery"
+import VSelect from "@/components/form/VSelect.vue"
 
 const peopleQuery = usePeopleQuery()
 
@@ -78,9 +79,8 @@ function resetForm() {
 				<label class="flex flex-col gap-1 col-span-3">
 					Colonia
 
-					<select
-						class="block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border w-full text-base"
-						name="selectedColonies"
+					<VSelect
+						id="selectedColonies"
 						v-model="selectedColonies"
 						multiple
 						size="2"
@@ -88,19 +88,13 @@ function resetForm() {
 						<option v-for="colony in colonies" :key="colony" class="truncate">
 							{{ colony }}
 						</option>
-					</select>
+					</VSelect>
 				</label>
 
 				<label class="flex flex-col gap-1 col-span-2">
 					Día de vuelta
 
-					<select
-						class="block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border w-full text-base"
-						name="selectedDays"
-						v-model="selectedDays"
-						multiple
-						size="2"
-					>
+					<VSelect id="selectedDays" v-model="selectedDays" multiple size="2">
 						<option
 							v-for="day in days"
 							class="first-letter:uppercase truncate"
@@ -109,7 +103,7 @@ function resetForm() {
 						>
 							{{ DAYS[day] }}
 						</option>
-					</select>
+					</VSelect>
 				</label>
 			</div>
 
