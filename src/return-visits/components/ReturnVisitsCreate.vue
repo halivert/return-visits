@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
-import { useAddReturnVisit } from "@return-visits/queries/useAddReturnVisit"
-import { usePersonReturnVisits } from "@return-visits/queries/usePersonReturnVisits"
+import { useAddReturnVisit } from "@/return-visits/queries/useAddReturnVisit"
+import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
 
 const router = useRouter()
 

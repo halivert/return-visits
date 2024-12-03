@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import { usePeopleQuery } from "@people/queries/usePeople"
+import { usePeopleQuery } from "@/people/queries/usePeople"
 import { DAYS } from "@/constants"
 
 const peopleQuery = usePeopleQuery()

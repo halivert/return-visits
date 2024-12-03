@@ -1,8 +1,8 @@
 import { computed, MaybeRef, unref } from "vue"
 import { useMutation, useQueryClient } from "@tanstack/vue-query"
 import { Person } from "@/db/models/Person"
-import { peopleKeys } from "@people/queries/peopleKeys"
-import { usePerson } from "@people/queries/usePerson"
+import { peopleKeys } from "@/people/queries/peopleKeys"
+import { usePerson } from "@/people/queries/usePerson"
 import { updateInStore } from "@/db/useDatabase"
 
 interface UseUpdatePersonParams {

@@ -9,10 +9,6 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": fileURLToPath(new URL("./src", import.meta.url)),
-			"@people": fileURLToPath(new URL("./src/people", import.meta.url)),
-			"@return-visits": fileURLToPath(
-				new URL("./src/return-visits", import.meta.url)
-			),
 		},
 	},
 	plugins: [

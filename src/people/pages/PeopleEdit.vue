@@ -16,11 +16,11 @@ export default {
 import { computed, reactive, ref, watch } from "vue"
 import { onBeforeRouteUpdate, useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
-import { usePerson } from "@people/queries/usePerson"
-import { useColonies } from "@people/composables/useColonies"
+import { usePerson } from "@/people/queries/usePerson"
+import { useColonies } from "@/people/composables/useColonies"
 import { Person } from "@/db/models/Person"
-import { useAsyncPerson } from "@people/queries/useAsyncPerson"
-import { useUpdatePerson } from "../queries/useUpdatePerson"
+import { useAsyncPerson } from "@/people/queries/useAsyncPerson"
+import { useUpdatePerson } from "@/people/queries/useUpdatePerson"
 
 const router = useRouter()
 const colonies = useColonies()

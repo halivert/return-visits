@@ -25,7 +25,7 @@ const stores = defineStores({
 	},
 	returnVisits: {
 		type: {} as ReturnVisit,
-		key: ["", new Date()] as [string, Date],
+		key: [0, new Date()] as [number, Date],
 		options: {
 			keyPath: ["personId", "date"],
 		},
@@ -90,6 +90,38 @@ export async function getStore(
 	})
 }
 
+export async function getStoreCursor<TStore extends Store>(
+	store: TStore,
+	transactionMode: IDBTransactionMode,
+	key: Stores[TStore]["key"]
+): Promise<IDBCursorWithValue> {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const dbStore = await getStore(store, transactionMode)
+			const cursorRequest = dbStore.openCursor(key)
+
+			cursorRequest.onsuccess = (event) => {
+				// @ts-expect-error result should be cursor
+				const cursor: IDBCursorWithValue = event.target.result
+				if (!cursor) {
+					reject(new Error("Error, elemento no encontrado"))
+					return
+				}
+
+				resolve(cursor)
+			}
+
+			cursorRequest.onerror = (event) => {
+				// @ts-expect-error result should be present
+				const result = event.target.result
+				reject(new Error(result || "Error, elemento no encontrado"))
+			}
+		} catch (error) {
+			reject(error)
+		}
+	})
+}
+
 export async function addToStore<TStore extends Store>(
 	store: TStore,
 	value: CreateType<Stores, TStore>
@@ -129,36 +161,51 @@ export async function updateInStore<TStore extends Store>(
 			if (import.meta.env.DEV) {
 				console.log(`Updating in ${store}, item ${key}`, { value })
 			}
-			const dbStore = await getStore(store, "readwrite")
-			const cursorRequest = dbStore.openCursor(key)
+			const cursor = await getStoreCursor(store, "readwrite", key)
 
-			cursorRequest.onsuccess = (event) => {
-				// @ts-expect-error result should be cursor
-				const cursor: IDBCursorWithValue = event.target.result
-				if (!cursor) {
-					reject(new Error("Error, elemento no encontrado"))
-					return
-				}
+			const request = cursor.update(value)
 
-				const request = cursor.update(value)
-
-				request.onerror = (event) => {
-					// @ts-expect-error result should be present
-					const result = event.target.result
-					reject(new Error(result || "Error en la actualización"))
-				}
-
-				request.onsuccess = (event) => {
-					// @ts-expect-error result should be present
-					const result = event.target.result
-					resolve(result)
-				}
-			}
-
-			cursorRequest.onerror = (event) => {
+			request.onerror = (event) => {
 				// @ts-expect-error result should be present
 				const result = event.target.result
-				reject(new Error(result || "Error, elemento no encontrado"))
+				reject(new Error(result || "Error en la actualización"))
+			}
+
+			request.onsuccess = (event) => {
+				// @ts-expect-error result should be present
+				const result = event.target.result
+				resolve(result)
+			}
+		} catch (error) {
+			reject(error)
+		}
+	})
+}
+
+export async function deleteFromStore<TStore extends Store>(
+	store: TStore,
+	key: Stores[TStore]["key"]
+): Promise<undefined> {
+	return new Promise(async (resolve, reject) => {
+		try {
+			if (import.meta.env.DEV) {
+				console.log(`Delete from ${store}, item ${key}`)
+			}
+
+			const cursor = await getStoreCursor(store, "readwrite", key)
+
+			const request = cursor.delete()
+
+			request.onerror = (event) => {
+				// @ts-expect-error result should be present
+				const result = event.target.result
+				reject(new Error(result || "Error en la actualización"))
+			}
+
+			request.onsuccess = (event) => {
+				// @ts-expect-error result should be present
+				const result = event.target.result
+				resolve(result)
 			}
 		} catch (error) {
 			reject(error)

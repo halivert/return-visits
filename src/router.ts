@@ -18,14 +18,14 @@ export const router = createRouter({
 				{
 					path: "create",
 					name: "PeopleCreate",
-					component: () => import("@people/pages/PeopleCreate.vue"),
+					component: () => import("@/people/pages/PeopleCreate.vue"),
 					meta: {
 						title: `Agregar persona | ${appName}`,
 					},
 				},
 				{
 					path: ":id",
-					component: () => import("@people/pages/PeopleShow.vue"),
+					component: () => import("@/people/pages/PeopleShow.vue"),
 					props: (to) => ({
 						id: parseInt(to.params.id as string, 10),
 					}),
@@ -34,7 +34,7 @@ export const router = createRouter({
 							path: "",
 							name: "PeopleShow",
 							component: () =>
-								import("@return-visits/components/ReturnVisitsList.vue"),
+								import("@/return-visits/components/ReturnVisitsList.vue"),
 							props: (to) => ({
 								id: parseInt(to.params.id as string, 10),
 							}),
@@ -43,7 +43,7 @@ export const router = createRouter({
 							path: "return-visits/create",
 							name: "PeopleReturnVisitsCreate",
 							component: () =>
-								import("@return-visits/components/ReturnVisitsCreate.vue"),
+								import("@/return-visits/components/ReturnVisitsCreate.vue"),
 							props: (to) => ({
 								id: parseInt(to.params.id as string, 10),
 							}),
@@ -52,10 +52,12 @@ export const router = createRouter({
 							path: "return-visits/:date/edit",
 							name: "PeopleReturnVisitsEdit",
 							component: () =>
-								import("@return-visits/components/ReturnVisitsEdit.vue"),
+								import("@/return-visits/components/ReturnVisitsEdit.vue"),
 							props: (to) => ({
 								id: parseInt(to.params.id as string, 10),
-								date: new Date(decodeURIComponent(to.params.date as string)),
+								date: new Date(
+									decodeURIComponent(to.params.date as string) + "Z"
+								),
 							}),
 						},
 					],
@@ -63,7 +65,7 @@ export const router = createRouter({
 				{
 					path: ":id/edit",
 					name: "PeopleEdit",
-					component: () => import("@people/pages/PeopleEdit.vue"),
+					component: () => import("@/people/pages/PeopleEdit.vue"),
 					props: (to) => ({
 						id: parseInt(to.params.id as string, 10),
 					}),

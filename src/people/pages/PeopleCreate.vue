@@ -2,8 +2,8 @@
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
-import { useAddPeople } from "@people/queries/useAddPeople"
-import { useColonies } from "@people/composables/useColonies"
+import { useAddPeople } from "@/people/queries/useAddPeople"
+import { useColonies } from "@/people/composables/useColonies"
 
 const router = useRouter()
 

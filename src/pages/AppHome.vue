@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PeopleList from "@people/components/PeopleList.vue"
+import PeopleList from "@/people/components/PeopleList.vue"
 </script>
 
 <template>

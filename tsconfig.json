@@ -20,9 +20,7 @@
 		"types": ["vite/client"],
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"],
-			"@people/*": ["src/people/*"],
-			"@return-visits/*": ["src/return-visits/*"]
+			"@/*": ["src/*"]
 		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],

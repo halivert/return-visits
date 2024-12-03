@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import { usePersonReturnVisits } from "@return-visits/queries/usePersonReturnVisits"
+import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
 
 const props = defineProps<{
 	id: number
