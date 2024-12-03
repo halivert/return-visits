@@ -1,0 +1,1 @@
+import{C as n,r as a,K as l,x as o,i as s}from"./index-B5qpgIxp.js";function f(){return n({queryKey:a.all(),queryFn:()=>l("returnVisits"),staleTime:0})}function c({personId:r}={}){const i=f();return o(()=>{var t,u;return new Set((u=(t=i.data.value)==null?void 0:t.filter(e=>s(r)==null?!0:e.personId===s(r)))==null?void 0:u.map(({topic:e})=>e))})}export{c as u};
