@@ -147,6 +147,7 @@ async function handleSubmit(event: Event) {
 				type="string"
 				name="topic"
 				@input="errors['topic'] = ''"
+				placeholder="En esta visita hablamos de..."
 				list="topicDataList"
 				required
 			/>
@@ -227,6 +228,7 @@ async function handleSubmit(event: Event) {
 						: 'border-asparagus-100 accent-asparagus-600',
 				]"
 				name="notes"
+				placeholder="Quedé en volver para platicar sobre..."
 				rows="10"
 				maxlength="500"
 			></textarea>

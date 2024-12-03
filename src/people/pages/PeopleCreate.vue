@@ -162,6 +162,7 @@ function handleSubmit() {
 					type="text"
 					name="name"
 					v-model="addPersonForm.name"
+					placeholder="Saulo"
 					@input="errors['name'] = ''"
 					required
 				/>
@@ -187,6 +188,7 @@ function handleSubmit() {
 					name="colony"
 					list="colonyList"
 					v-model="addPersonForm.colony"
+					placeholder="Tarso"
 					@input="errors['colony'] = ''"
 					required
 				/>
@@ -236,6 +238,13 @@ function handleSubmit() {
 					rows="8"
 					name="description"
 					v-model="addPersonForm.description"
+					:placeholder="
+						[
+							'Calle Recta, casa de Judas.\n',
+							'Israelita de la tribu de Benjamín',
+							'Estaba orando, no puede ver.',
+						].join('\n')
+					"
 					maxlength="250"
 				></textarea>
 
@@ -307,6 +316,7 @@ function handleSubmit() {
 					v-model="addPersonForm.topic"
 					@input="errors['topic'] = ''"
 					list="topicDataList"
+					placeholder="Visitar para devolver la vista"
 					required
 				/>
 
@@ -387,6 +397,12 @@ function handleSubmit() {
 					]"
 					name="notes"
 					v-model="addPersonForm.notes"
+					:placeholder="
+						[
+							'Jesucristo me envió, no tengo muchas ganas de ir porque este hombre le ha hecho mucho daño a los santos en Jerusalén.\n',
+							'Jesús dice que es un instrumento para llevar su nombre a las naciones.',
+						].join('\n')
+					"
 					rows="10"
 					maxlength="500"
 				></textarea>
