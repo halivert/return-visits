@@ -87,7 +87,7 @@ useTitle(
 				Volver el {{ DAYS[returnDay] }}
 			</span>
 
-			<p>
+			<p class="whitespace-pre">
 				{{ person.description }}
 			</p>
 

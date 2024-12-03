@@ -36,7 +36,10 @@ const returnDays = computed<Record<number, number | undefined>>(() =>
 	Object.fromEntries(
 		returnVisitsQueries.value
 			.filter(({ data }) => !!data?.at(0)?.personId)
-			.map(({ data }) => [data?.at(0)?.personId, data?.at(0)?.date.getDay()])
+			.map(({ data }) => [
+				data?.at(0)?.personId,
+				data?.at(0)?.returnDate.getDay(),
+			])
 	)
 )
 
@@ -144,9 +147,7 @@ function resetForm() {
 					Volver el {{ DAYS[returnDays[person.id] as number] }}
 				</small>
 
-				<p class="mt-5">
-					{{ person.description }}
-				</p>
+				<p class="mt-5 whitespace-pre">{{ person.description }}</p>
 			</article>
 		</div>
 	</div>

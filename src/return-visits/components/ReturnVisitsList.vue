@@ -46,7 +46,7 @@ function getUrlDate(date: Date) {
 				</RouterLink>
 			</h2>
 
-			<div class="flex justify-between">
+			<div class="flex justify-between flex-wrap">
 				<p>
 					<strong>
 						{{ getDatetime(returnVisit.date) }}
@@ -61,7 +61,7 @@ function getUrlDate(date: Date) {
 				</p>
 			</div>
 
-			<p v-if="returnVisit.notes" class="text-sm mt-3">
+			<p v-if="returnVisit.notes" class="text-sm mt-3 whitespace-pre">
 				{{ returnVisit.notes }}
 			</p>
 		</article>
