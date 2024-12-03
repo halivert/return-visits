@@ -46,7 +46,7 @@ const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
 })
 
 const title = computed(() => {
-	if (offlineReady.value) return "Modo offline activado"
+	if (offlineReady.value) return "Ya puedes usar la aplicación sin datos."
 	if (needRefresh.value)
 		return "Nuevo contenido disponible, por favor refresca la página."
 	return ""
@@ -61,7 +61,7 @@ function close() {
 <template>
 	<div
 		v-if="offlineReady || needRefresh"
-		class="pwa-toast text-rangoon-900"
+		class="pwa-toast text-rangoon-900 bg-lemon-50 z-20"
 		aria-labelledby="toast-message"
 		role="alert"
 	>
@@ -93,7 +93,6 @@ function close() {
 	padding: 12px;
 	border: 1px solid #8885;
 	border-radius: 4px;
-	z-index: 1;
 	text-align: left;
 	box-shadow: 3px 4px 5px 0 #8885;
 	display: grid;
