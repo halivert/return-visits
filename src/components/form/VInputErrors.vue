@@ -16,7 +16,7 @@ const normalErrors = computed(
 </script>
 
 <template>
-	<small class="text-chili-600" v-if="normalErrors.size">
+	<small class="text-chili-600 whitespace-pre-line" v-if="normalErrors.size">
 		<template v-for="(error, i) in normalErrors" :key="error">
 			{{ error }}
 			<br v-if="i < normalErrors.size - 1" />

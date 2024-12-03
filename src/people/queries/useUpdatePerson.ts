@@ -23,16 +23,19 @@ export function useUpdatePerson({ id }: UseUpdatePersonParams) {
 
 					const original = originalPerson.value
 
+					const location =
+						"location" in person ? person.location : original.location
+
 					const data: Person = {
 						id: original.id,
 						name: (person.name ?? original.name).trim(),
 						colony: (person.colony ?? original.colony).trim(),
 						description: (person.description ?? original.description).trim(),
-						location: original.location
+						location: location
 							? {
-									latitude: original.location.latitude,
-									longitude: original.location.longitude,
-									altitude: original.location.altitude,
+									latitude: location.latitude,
+									longitude: location.longitude,
+									altitude: location.altitude,
 							  }
 							: undefined,
 					}

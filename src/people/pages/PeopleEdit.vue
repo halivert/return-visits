@@ -13,7 +13,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { onBeforeRouteUpdate, useRouter } from "vue-router"
 import { useGeolocation } from "@vueuse/core"
 import { usePerson } from "@/people/queries/usePerson"
@@ -21,7 +21,11 @@ import { useColonies } from "@/people/composables/useColonies"
 import { Person } from "@/db/models/Person"
 import { useAsyncPerson } from "@/people/queries/useAsyncPerson"
 import { useUpdatePerson } from "@/people/queries/useUpdatePerson"
-import { useDeletePerson } from "../queries/useDeletePerson"
+import { useDeletePerson } from "@/people/queries/useDeletePerson"
+import { useForm } from "@/components/form/useForm"
+import VInput from "@/components/form/VInput.vue"
+import VInputErrors from "@/components/form/VInputErrors.vue"
+import VTextarea from "@/components/form/VTextarea.vue"
 
 const router = useRouter()
 const colonies = useColonies()
@@ -44,65 +48,58 @@ const person = computed(() => personQuery.data.value)
 const updatePersonMutation = useUpdatePerson({ id })
 const deletePerson = useDeletePerson({ id })
 
-const personForm = reactive<Omit<Person, "id" | "location">>({
-	name: person.value?.name ?? "",
-	colony: person.value?.colony ?? "",
-	description: person.value?.description ?? "",
+const personForm = useForm({
+	name: person.value?.name,
+	colony: person.value?.colony,
+	description: person.value?.description,
+	location: person.value?.location,
 })
 
 watch(person, (person) => {
-	if (!person) return
-
-	personForm.name = person.name
-	personForm.colony = person.colony
-	personForm.description = person.description
+	personForm.name = person?.name
+	personForm.colony = person?.colony
+	personForm.description = person?.description
 })
 
-const errors = ref<Record<string, string>>({})
 const locationRecentlyUpdated = ref(false)
 
-async function updatePerson(person: Partial<Omit<Person, "id">>) {
+async function handleSubmit() {
 	if (updatePersonMutation.isPending.value) return
-	if (Object.values(errors.value).some((error) => error)) return
+
+	if (!personForm.name) {
+		personForm.errors.name = "Falta nombre"
+	}
+
+	if (!personForm.colony) {
+		personForm.errors.colony = "Falta colonia"
+	}
+
+	if (Object.values(personForm.errors).some(Boolean)) return
 
 	try {
-		await updatePersonMutation.mutateAsync(
-			"location" in person
-				? { location: person.location }
-				: {
-						name: person.name,
-						colony: person.colony,
-						description: person.description,
-				  }
-		)
+		await updatePersonMutation.mutateAsync(personForm)
 
-		if (!("location" in person)) {
-			return router.push({
-				name: "PeopleShow",
-				params: { id: id.value },
-			})
-		}
+		return router.back()
+	} catch (e) {
+		console.info(e)
+	}
+}
+
+async function updateLocation(coords?: Person["location"]) {
+	try {
+		personForm.location = coords
+
+		console.info(personForm)
+
+		await updatePersonMutation.mutateAsync(personForm)
 
 		locationRecentlyUpdated.value = true
 		setTimeout(() => {
 			locationRecentlyUpdated.value = false
 		}, 2000)
 	} catch (e) {
-		console.info(e)
-		alert("Error guardando los datos\nPor favor intenta de nuevo")
+		personForm.errors.location = e instanceof Error ? e.message : `${e}`
 	}
-}
-
-function handleSubmit() {
-	if (!personForm.name) {
-		errors.value = { ...errors.value, name: "Falta nombre" }
-	}
-
-	if (!personForm.colony) {
-		errors.value = { ...errors.value, colony: "Falta colonia" }
-	}
-
-	updatePerson(personForm)
 }
 
 function updatePersonLocation() {
@@ -110,35 +107,24 @@ function updatePersonLocation() {
 
 	watch(
 		[geolocation.coords, geolocation.error],
-		async ([coords, error]) => {
+		([coords, error]) => {
 			if (error) {
-				errors.value = {
-					...errors.value,
-					location:
-						"Error actualizando la ubicación.\nRevisa que la aplicación tenga los permisos necesarios.",
-				}
+				personForm.errors.location =
+					"Error actualizando la ubicación.\nRevisa que la aplicación tenga los permisos necesarios."
+
 				return
 			}
 
-			errors.value = {
-				...errors.value,
-				location: "",
-			}
+			personForm.errors.location = ""
 
-			updatePerson({
-				location: {
-					latitude: coords.latitude,
-					longitude: coords.longitude,
-					altitude: coords.altitude,
-				},
-			})
+			updateLocation(coords)
 		},
 		{ once: true }
 	)
 }
 
 function removePersonLocation() {
-	updatePerson({ location: undefined })
+	updateLocation(undefined)
 }
 
 async function handleDeletePerson() {
@@ -171,60 +157,26 @@ async function handleDeletePerson() {
 			>
 				<label class="text-right" for="name">Nombre</label>
 
-				<div class="col-span-2">
-					<input
-						id="name"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 w-full',
-							errors['name']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
-						type="text"
-						name="name"
-						v-model="personForm.name"
-						@input="errors['name'] = ''"
-						:placeholder="person.name"
-						required
-					/>
-
-					<small class="text-chili-600" v-if="errors['name']">
-						{{ errors["name"] }}
-					</small>
-				</div>
+				<VInput
+					id="name"
+					div-class="col-span-2"
+					v-model="personForm.name"
+					v-model:errors="personForm.errors.name"
+					:placeholder="person.name"
+					required
+				/>
 
 				<label class="text-right" for="colony">Colonia</label>
 
-				<div class="col-span-2">
-					<input
-						id="colony"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'h-8 w-full',
-							errors['colony']
-								? 'border-chili-400 accent-chili-600'
-								: 'border-asparagus-100 accent-asparagus-600',
-						]"
-						type="text"
-						name="colony"
-						list="colonyList"
-						v-model="personForm.colony"
-						@input="errors['colony'] = ''"
-						:placeholder="person.colony"
-						required
-					/>
-
-					<small class="text-chili-600" v-if="errors['colony']">
-						{{ errors["colony"] }}
-					</small>
-
-					<datalist id="colonyList">
-						<option v-for="colony in colonies" :key="colony">
-							{{ colony }}
-						</option>
-					</datalist>
-				</div>
+				<VInput
+					id="colony"
+					div-class="col-span-2"
+					:list="colonies"
+					v-model="personForm.colony"
+					v-model:errors="personForm.errors.colony"
+					:placeholder="person.colony"
+					required
+				/>
 
 				<div class="col-start-2 col-span-2">
 					<div class="flex gap-2">
@@ -232,7 +184,7 @@ async function handleDeletePerson() {
 							:class="[
 								'flex-1 px-2 py-1 rounded',
 								'disabled:cursor-not-allowed disabled:grayscale',
-								errors['location']
+								personForm.errors.location
 									? 'bg-chili-600 text-chili-50'
 									: 'bg-lemon-500',
 							]"
@@ -264,30 +216,21 @@ async function handleDeletePerson() {
 						</button>
 					</div>
 
-					<small
-						class="text-chili-600 whitespace-pre-line"
-						v-if="errors['location']"
-					>
-						{{ errors["location"] }}
-					</small>
+					<VInputErrors :errors="personForm.errors.location" />
 				</div>
 
 				<label class="text-right" for="description">Descripción</label>
 
-				<div class="col-span-2">
-					<textarea
-						id="description"
-						:class="[
-							'block dark:text-lemon-50 px-2 py-1 max-w-full rounded-sm border',
-							'resize-y min-h-16 max-h-72 w-full',
-						]"
-						rows="8"
-						name="description"
-						v-model="personForm.description"
-						:placeholder="person.description"
-						maxlength="250"
-					></textarea>
-				</div>
+				<VTextarea
+					id="description"
+					div-class="col-span-2"
+					class="resize-y min-h-16 max-h-72"
+					rows="8"
+					v-model="personForm.description"
+					v-model:errors="personForm.errors.description"
+					:placeholder="person.description"
+					maxlength="250"
+				/>
 
 				<RouterLink
 					class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"
