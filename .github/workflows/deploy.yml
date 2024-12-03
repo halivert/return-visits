@@ -24,7 +24,7 @@ jobs:
       - name: Build JS files
         run: |
           npm i
-          npm run build -- --base="./"
+          npm run build -- --base="/return-visits/"
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4

@@ -61,7 +61,7 @@ function close() {
 <template>
 	<div
 		v-if="offlineReady || needRefresh"
-		class="pwa-toast"
+		class="pwa-toast text-rangoon-900"
 		aria-labelledby="toast-message"
 		role="alert"
 	>
