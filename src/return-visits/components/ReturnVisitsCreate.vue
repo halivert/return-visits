@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useAddReturnVisit } from "@/return-visits/queries/useAddReturnVisit"
 import {
@@ -11,6 +11,8 @@ import VTextarea from "@/components/form/VTextarea.vue"
 import { useAvailableTopics } from "@/return-visits/composables/useAvailableTopics"
 import VInputErrors from "@/components/form/VInputErrors.vue"
 import { useForm } from "@/components/form/useForm"
+import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
+import { WEEK_IN_MILIS } from "@/constants"
 
 const router = useRouter()
 
@@ -18,13 +20,16 @@ const props = defineProps<{
 	id: number
 }>()
 
-const id = computed(() => props.id)
+const personId = computed(() => props.id)
 
-const addReturnVisitMutation = useAddReturnVisit({ personId: id })
+const lastReturnVisitQuery = usePersonReturnVisits({ personId })
+const addReturnVisitMutation = useAddReturnVisit({ personId })
 const availableTopics = useAvailableTopics()
 
+const lastReturnVisit = computed(() => lastReturnVisitQuery.data.value?.at(0))
+
 const now = new Date()
-const sevenDaysAfter = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+const sevenDaysAfter = new Date(now.getTime() + WEEK_IN_MILIS)
 
 const returnVisitForm = useForm({
 	date: getDateForInput(now),
@@ -35,7 +40,22 @@ const returnVisitForm = useForm({
 	notes: "",
 })
 
+watch(lastReturnVisit, (returnVisit) => {
+	if (!returnVisit) return
+
+	const returnDate = returnVisit.returnDate
+	returnVisitForm.date = getDateForInput(returnDate)
+	returnVisitForm.time = getTimeForInput(returnDate)
+
+	const sevenDaysAfter = new Date(returnDate.getTime() + WEEK_IN_MILIS)
+
+	returnVisitForm.returnDate = getDateForInput(sevenDaysAfter)
+	returnVisitForm.returnTime = getTimeForInput(sevenDaysAfter)
+})
+
 async function handleSubmit() {
+	if (addReturnVisitMutation.isPending.value) return
+
 	if (!returnVisitForm.date) {
 		returnVisitForm.errors.date = "Falta fecha"
 	}
@@ -79,9 +99,9 @@ async function handleSubmit() {
 		})
 
 		router.back()
-	} catch (error) {
-		returnVisitForm.errors.time =
-			error instanceof Error ? error.message : "Error desconocido"
+	} catch (e) {
+		console.info(e)
+		alert("Error guardando los datos\nPor favor intenta de nuevo")
 	}
 }
 </script>
@@ -97,8 +117,8 @@ async function handleSubmit() {
 		<div class="col-span-2">
 			<div class="flex flex-wrap gap-2">
 				<VInput
-					div-class="flex-1"
 					id="date"
+					div-class="flex-1"
 					type="date"
 					v-model="returnVisitForm.date"
 					v-model:errors="returnVisitForm.errors.date"
@@ -107,8 +127,8 @@ async function handleSubmit() {
 				/>
 
 				<VInput
-					div-class="flex-1"
 					id="time"
+					div-class="flex-1"
 					type="time"
 					v-model="returnVisitForm.time"
 					v-model:errors="returnVisitForm.errors.time"
@@ -125,20 +145,14 @@ async function handleSubmit() {
 		<label class="text-right" for="topic">Tema</label>
 
 		<VInput
-			div-class="col-span-2"
 			id="topic"
+			div-class="col-span-2"
 			v-model="returnVisitForm.topic"
 			v-model:errors="returnVisitForm.errors.topic"
 			placeholder="En esta visita hablamos de..."
-			list="topicDataList"
+			:list="availableTopics"
 			required
 		/>
-
-		<datalist id="topicDataList">
-			<option v-for="topic in availableTopics" :key="topic">
-				{{ topic }}
-			</option>
-		</datalist>
 
 		<div class="text-right">
 			<label for="returnDate">Fecha</label>
@@ -154,8 +168,8 @@ async function handleSubmit() {
 					div-class="flex-1"
 					type="date"
 					v-model="returnVisitForm.returnDate"
-					:min="returnVisitForm.date"
 					v-model:errors="returnVisitForm.errors.returnDate"
+					:min="returnVisitForm.date"
 					hide-errors
 					required
 				/>
@@ -182,8 +196,8 @@ async function handleSubmit() {
 		<label class="text-right" for="notes">Notas</label>
 
 		<VTextarea
-			div-class="col-span-2"
 			id="notes"
+			div-class="col-span-2"
 			class="resize-y min-h-16 max-h-72"
 			placeholder="Quedé en volver para platicar sobre..."
 			v-model="returnVisitForm.notes"
@@ -192,7 +206,7 @@ async function handleSubmit() {
 
 		<RouterLink
 			class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"
-			:to="{ name: 'PeopleShow', params: { id } }"
+			:to="{ name: 'PeopleShow', params: { personId } }"
 		>
 			Cancelar
 		</RouterLink>
