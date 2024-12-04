@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query"
 import { Person } from "@/db/models/Person"
-import { addToStore } from "@/db/useDatabase"
-import { peopleKeys } from "./peopleKeys"
+import { addToStore, clearStore } from "@/db/useDatabase"
+import { peopleKeys } from "@/people/queries/peopleKeys"
 
 export function useImportPeople() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
 		mutationFn: async (people: Person[]): Promise<number[]> => {
+			await clearStore("people")
+
 			const createPromises = people.map((person) =>
 				addToStore("people", person)
 			)

@@ -213,6 +213,35 @@ export async function deleteFromStore<TStore extends Store>(
 	})
 }
 
+export async function clearStore<TStore extends Store>(
+	store: TStore
+): Promise<undefined> {
+	return new Promise(async (resolve, reject) => {
+		try {
+			if (import.meta.env.DEV) {
+				console.log(`Clearing store ${store}`)
+			}
+
+			const objectStore = await getStore(store, "readwrite")
+			const request = objectStore.clear()
+
+			request.onerror = (event) => {
+				// @ts-expect-error result should be present
+				const result = event.target.result
+				reject(new Error(result || "Error en la limpieza"))
+			}
+
+			request.onsuccess = (event) => {
+				// @ts-expect-error result should be present
+				const result: undefined = event.target.result
+				resolve(result)
+			}
+		} catch (error) {
+			reject(error)
+		}
+	})
+}
+
 export async function getFromStore<TStore extends Store>(
 	store: TStore,
 	query: Stores[TStore]["key"]

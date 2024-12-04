@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query"
 import { ReturnVisit } from "@/return-visits/models/ReturnVisit"
-import { addToStore } from "@/db/useDatabase"
+import { addToStore, clearStore } from "@/db/useDatabase"
 import { returnVisitsKeys } from "./returnVisitsKeys"
 
 export function useImportReturnVisits() {
@@ -10,6 +10,8 @@ export function useImportReturnVisits() {
 		mutationFn: async (
 			returnVisits: ReturnVisit[]
 		): Promise<[number, Date][]> => {
+			await clearStore("returnVisits")
+
 			const createPromises = returnVisits.map((returnVisit) =>
 				addToStore("returnVisits", returnVisit)
 			)
