@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import { useRegisterSW } from "virtual:pwa-register/vue"
+import VButton from "./VButton.vue"
 
 // check for updates every hour
 const period = 1 * 1000
@@ -71,15 +72,15 @@ function close() {
 			</span>
 		</div>
 		<div class="buttons">
-			<button
+			<VButton
+				color="asparagus"
 				v-if="needRefresh"
 				type="button"
-				class="reload"
 				@click="updateServiceWorker()"
 			>
 				Refrescar
-			</button>
-			<button type="button" @click="close">Cerrar</button>
+			</VButton>
+			<VButton color="white" type="button" @click="close">Cerrar</VButton>
 		</div>
 	</div>
 </template>

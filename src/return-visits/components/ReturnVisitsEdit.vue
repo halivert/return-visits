@@ -15,6 +15,7 @@ import VInput from "@/components/form/VInput.vue"
 import VTextarea from "@/components/form/VTextarea.vue"
 import VSelect from "@/components/form/VSelect.vue"
 import { useForm } from "@/components/form/useForm"
+import VButton from "@/components/VButton.vue"
 
 const router = useRouter()
 
@@ -252,20 +253,16 @@ async function handleSubmit() {
 				Cancelar
 			</RouterLink>
 
-			<button
-				class="bg-asparagus-600 rounded px-2 py-1 text-lemon-50"
-				type="submit"
-			>
-				Guardar
-			</button>
+			<VButton color="asparagus" type="submit">Guardar</VButton>
 
-			<button
-				class="col-start-2 bg-fawn-600 rounded px-2 py-1 text-fawn-50 text-center"
+			<VButton
+				class="col-start-2"
+				color="fawn"
 				@click="handleDeleteReturnVisit"
 				type="button"
 			>
 				Eliminar
-			</button>
+			</VButton>
 		</form>
 	</div>
 </template>

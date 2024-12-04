@@ -13,6 +13,7 @@ import { useForm } from "@/components/form/useForm"
 import VInput from "@/components/form/VInput.vue"
 import VTextarea from "@/components/form/VTextarea.vue"
 import VInputErrors from "@/components/form/VInputErrors.vue"
+import VButton from "@/components/VButton.vue"
 
 const router = useRouter()
 const colonies = useColonies()
@@ -300,13 +301,14 @@ function handleSubmit() {
 				"
 			/>
 
-			<button
-				class="col-start-3 bg-asparagus-600 rounded px-2 py-1 text-lemon-50"
+			<VButton
+				class="col-start-3"
+				color="asparagus"
 				type="submit"
 				:disabled="addPersonMutation.isPending.value"
 			>
 				Guardar
-			</button>
+			</VButton>
 		</form>
 	</main>
 </template>

@@ -13,6 +13,7 @@ import VInputErrors from "@/components/form/VInputErrors.vue"
 import { useForm } from "@/components/form/useForm"
 import { usePersonReturnVisits } from "@/return-visits/queries/usePersonReturnVisits"
 import { WEEK_IN_MILIS } from "@/constants"
+import VButton from "@/components/VButton.vue"
 
 const router = useRouter()
 
@@ -206,17 +207,18 @@ async function handleSubmit() {
 
 		<RouterLink
 			class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"
-			:to="{ name: 'PeopleShow', params: { personId } }"
+			:to="{ name: 'PeopleShow', params: { id: personId } }"
 		>
 			Cancelar
 		</RouterLink>
 
-		<button
-			class="col-start-3 bg-asparagus-600 rounded px-2 py-1 text-lemon-50"
+		<VButton
+			class="col-start-3"
+			color="asparagus"
 			type="submit"
 			:disabled="addReturnVisitMutation.isPending.value"
 		>
 			Guardar
-		</button>
+		</VButton>
 	</form>
 </template>

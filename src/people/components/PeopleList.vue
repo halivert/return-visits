@@ -5,6 +5,7 @@ import { usePeopleQuery } from "@/people/queries/usePeople"
 import { DAYS } from "@/constants"
 import { personReturnVisitsQuery } from "@/return-visits/queries/personReturnVisitsQuery"
 import VSelect from "@/components/form/VSelect.vue"
+import VButton from "@/components/VButton.vue"
 
 const peopleQuery = usePeopleQuery()
 
@@ -108,13 +109,13 @@ function resetForm() {
 			</div>
 
 			<div class="text-right">
-				<button
+				<VButton
 					type="reset"
-					class="px-2 py-1 rounded bg-asparagus-600 text-lemon-50 disabled:cursor-not-allowed disabled:grayscale"
-					:disabled="!selectedDays && !selectedColonies"
+					color="asparagus"
+					:disabled="!selectedDays.length && !selectedColonies.length"
 				>
 					Limpiar
-				</button>
+				</VButton>
 			</div>
 		</form>
 

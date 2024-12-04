@@ -26,6 +26,7 @@ import { useForm } from "@/components/form/useForm"
 import VInput from "@/components/form/VInput.vue"
 import VInputErrors from "@/components/form/VInputErrors.vue"
 import VTextarea from "@/components/form/VTextarea.vue"
+import VButton from "@/components/VButton.vue"
 
 const router = useRouter()
 const colonies = useColonies()
@@ -180,10 +181,9 @@ async function handleDeletePerson() {
 
 				<div class="col-start-2 col-span-2">
 					<div class="flex gap-2">
-						<button
+						<VButton
 							:class="[
-								'flex-1 px-2 py-1 rounded',
-								'disabled:cursor-not-allowed disabled:grayscale',
+								'flex-1',
 								personForm.errors.location
 									? 'bg-chili-600 text-chili-50'
 									: 'bg-lemon-500',
@@ -198,14 +198,12 @@ async function handleDeletePerson() {
 								Ubicación actualizada
 							</template>
 							<template v-else>Actualizar ubicación</template>
-						</button>
+						</VButton>
 
-						<button
+						<VButton
 							v-if="person.location && !locationRecentlyUpdated"
-							:class="[
-								'flex-1 px-2 py-1 rounded text-fawn-50',
-								'bg-fawn-600 disabled:cursor-not-allowed disabled:grayscale',
-							]"
+							color="fawn"
+							class="flex-1"
 							type="button"
 							@click="removePersonLocation"
 							:disabled="
@@ -213,7 +211,7 @@ async function handleDeletePerson() {
 							"
 						>
 							Eliminar ubicación
-						</button>
+						</VButton>
 					</div>
 
 					<VInputErrors :errors="personForm.errors.location" />
@@ -239,21 +237,23 @@ async function handleDeletePerson() {
 					Cancelar
 				</RouterLink>
 
-				<button
-					class="col-start-3 bg-asparagus-600 rounded px-2 py-1 text-lemon-50 disabled:cursor-not-allowed disabled:grayscale"
+				<VButton
+					class="col-start-3"
+					color="asparagus"
 					type="submit"
 					:disabled="updatePersonMutation.isPending.value"
 				>
 					Guardar
-				</button>
+				</VButton>
 
-				<button
-					class="col-start-2 bg-fawn-600 rounded px-2 py-1 text-fawn-50 text-center"
+				<VButton
+					class="col-start-2"
+					color="fawn"
 					@click="handleDeletePerson"
 					type="button"
 				>
 					Eliminar
-				</button>
+				</VButton>
 			</form>
 		</template>
 	</main>
