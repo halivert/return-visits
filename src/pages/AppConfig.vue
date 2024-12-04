@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useImportPeople } from "@/people/queries/useImportPeople"
 import { usePeopleQuery } from "@/people/queries/usePeople"
@@ -7,6 +7,7 @@ import { useImportReturnVisits } from "@/return-visits/queries/useImportReturnVi
 import { useReturnVisits } from "@/return-visits/queries/useReturnVisits"
 import { ReturnVisit } from "@/return-visits/models/ReturnVisit"
 import { Person } from "@/db/models/Person"
+import VButton from "@/components/VButton.vue"
 
 interface Data {
 	people: Person[]
@@ -19,6 +20,7 @@ const router = useRouter()
 
 const importPeople = useImportPeople()
 const importReturnVisits = useImportReturnVisits()
+const fileInput = ref<HTMLInputElement>()
 
 const url = computed(() => {
 	if (peopleQuery.isLoading.value || returnVisitsQuery.isLoading.value) {
@@ -52,7 +54,12 @@ function validPeople(people: unknown): people is Person[] {
 
 			if (!Number.isFinite(person.location.latitude)) return false
 			if (!Number.isFinite(person.location.longitude)) return false
-			if (!Number.isFinite(person.location.altitude)) return false
+			if (
+				person.location.altitude &&
+				!Number.isFinite(person.location.altitude)
+			) {
+				return false
+			}
 		}
 		return true
 	})
@@ -154,31 +161,27 @@ async function importData(event: Event) {
 <template>
 	<main class="max-w-prose mx-auto py-2 px-3">
 		<div class="flex gap-3 justify-center">
-			<a
-				:href="url"
-				:download="fileName"
-				class="bg-asparagus-600 rounded px-2 py-1 text-asparagus-50"
-			>
+			<VButton color="asparagus" :href="url" :download="fileName" external>
 				Exportar datos
-			</a>
+			</VButton>
 
 			<input
-				id="fileInput"
+				ref="fileInput"
 				class="hidden"
 				@change="importData"
 				type="file"
 				accept=".return-visits,application/json"
 			/>
 
-			<label
-				v-if="
-					!importReturnVisits.isPending.value && !importPeople.isPending.value
+			<VButton
+				:loading="
+					importReturnVisits.isPending.value || importPeople.isPending.value
 				"
-				class="bg-lemon-600 rounded px-2 py-1 text-lemon-50 cursor-pointer"
-				for="fileInput"
+				color="lemon"
+				@click="fileInput?.click()"
 			>
 				Importar datos
-			</label>
+			</VButton>
 		</div>
 	</main>
 </template>

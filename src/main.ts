@@ -1,8 +1,8 @@
 import { createApp } from "vue"
 import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query"
-import App from "./App.vue"
-import { getDatabase } from "./db/useDatabase"
-import { router } from "./router"
+import App from "@/App.vue"
+import { getDatabase } from "@/db/useDatabase"
+import { router } from "@/router"
 
 import "./style.css"
 

@@ -3,15 +3,44 @@
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
 
-  color-scheme: light dark;
+	color-scheme: light dark;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
+@layer components {
+	.button.disabled {
+		@apply opacity-60 cursor-default;
+	}
+
+	.button.is-loading {
+		@apply inline-flex justify-center items-center;
+		@apply pointer-events-none select-none text-transparent;
+	}
+
+	.button.is-loading::after,
+	.button.is-loading::before {
+		content: "";
+		@apply absolute border-2 w-4 h-4 rounded-full border-white/30;
+	}
+
+	.button.is-loading::before {
+		@apply border-white border-b-transparent border-l-transparent animate-spin;
+	}
+
+	.button.is-loading.light::after,
+	.button.is-loading.light::before {
+		@apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+	}
+
+	.button.is-loading.light::before {
+		@apply border-gray-600 border-b-transparent border-l-transparent animate-spin;
+	}
+}

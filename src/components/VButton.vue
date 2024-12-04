@@ -2,44 +2,53 @@
 import { computed } from "vue"
 import { RouterLink, RouterLinkProps } from "vue-router"
 
-type Color = "asparagus" | "lemon" | "fawn" | "chili" | "rangoon" | "white"
+type Color = "asparagus" | "lemon" | "fawn" | "chili" | "rangoon"
 
 const props = withDefaults(
 	defineProps<{
-		color?: Color
-		isOutlined?: boolean
+		color?: Color | ""
+		type?: HTMLButtonElement["type"]
 		href?: HTMLAnchorElement["href"] | RouterLinkProps["to"]
+		outlined?: boolean
+		external?: boolean
+		loading?: boolean
+		disabled?: boolean
 	}>(),
 	{
-		color: "white",
-		isOutlined: false,
+		type: "button",
+		color: "",
+		outlined: false,
+		external: false,
+		loading: false,
+		disabled: false,
 	}
 )
 
 const isLink = computed(() => !!props.href)
-const isExternal = computed(
-	() => typeof props.href === "string" && props.href.startsWith("http")
-)
 
-const colorClasses: Record<Color, string> = {
+const colorClasses: Record<Color | "", string> = {
+	"": "",
 	asparagus: "bg-asparagus-600 text-asparagus-50",
-	lemon: "",
+	lemon: "bg-lemon-600 text-lemon-50",
 	fawn: "bg-fawn-600 text-fawn-50",
 	chili: "",
 	rangoon: "",
-	white: "",
 }
 </script>
 
 <template>
 	<component
-		:is="isLink ? (isExternal ? 'a' : RouterLink) : 'button'"
+		:is="isLink ? (external ? 'a' : RouterLink) : 'button'"
 		:class="[
-			'px-2 py-1 rounded disabled:cursor-not-allowed disabled:opacity-60',
+			'button px-2 py-1 rounded',
 			colorClasses[color],
+			{ 'is-loading': loading },
+			{ disabled: disabled || loading },
 		]"
-		:href="isExternal ? href : undefined"
-		:to="isExternal ? undefined : href"
+		:href="external ? href : undefined"
+		:to="external ? undefined : href"
+		:type="isLink ? undefined : type"
+		:disabled="disabled || loading"
 	>
 		<slot />
 	</component>
