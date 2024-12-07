@@ -1,0 +1,1 @@
+import{I as s,f as t,p as o,y as a,x as y,u as p}from"./index-RMnMOCoq.js";function n(e,r={}){return s(()=>({...t(r),queryKey:o.detail(e),queryFn:({queryKey:u})=>a("people",u[2])}))}function c({id:e,options:r}){return y(n(e,r))}function f({id:e,options:r}){return p().ensureQueryData(n(e,r))}export{f as a,c as u};
