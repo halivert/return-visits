@@ -53,8 +53,6 @@ const title = computed(() => {
   return ""
 })
 
-needRefresh.value = true
-
 function close() {
   offlineReady.value = false
   needRefresh.value = false
