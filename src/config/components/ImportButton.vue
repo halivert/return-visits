@@ -1,45 +1,27 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { useImportPeople } from "@/people/queries/useImportPeople"
-import { usePeopleQuery } from "@/people/queries/usePeople"
-import { useImportReturnVisits } from "@/return-visits/queries/useImportReturnVisits"
-import { useReturnVisits } from "@/return-visits/queries/useReturnVisits"
-import { ReturnVisit } from "@/return-visits/models/ReturnVisit"
+import VButton, { Color } from "@/components/VButton.vue"
 import { Person } from "@/db/models/Person"
-import VButton from "@/components/VButton.vue"
+import { ReturnVisit } from "@/return-visits/models/ReturnVisit"
+import { useImportPeople } from "@/people/queries/useImportPeople"
+import { useImportReturnVisits } from "@/return-visits/queries/useImportReturnVisits"
 
-interface Data {
-	people: Person[]
-	returnVisits: ReturnVisit[]
-}
+const fileInput = ref<HTMLInputElement>()
 
-const peopleQuery = usePeopleQuery()
-const returnVisitsQuery = useReturnVisits()
+withDefaults(
+	defineProps<{
+		color?: Color
+	}>(),
+	{
+		color: "lemon",
+	},
+)
+
 const router = useRouter()
 
 const importPeople = useImportPeople()
 const importReturnVisits = useImportReturnVisits()
-const fileInput = ref<HTMLInputElement>()
-
-const url = computed(() => {
-	if (peopleQuery.isLoading.value || returnVisitsQuery.isLoading.value) {
-		return undefined
-	}
-
-	const data: Data = {
-		people: peopleQuery.data.value ?? [],
-		returnVisits: returnVisitsQuery.data.value ?? [],
-	}
-
-	const blob = new Blob([JSON.stringify(data)], { type: "application/json" })
-
-	return URL.createObjectURL(blob)
-})
-
-const fileName = computed(() => {
-	return new Date().toISOString() + ".return-visits"
-})
 
 function validPeople(people: unknown): people is Person[] {
 	if (!Array.isArray(people)) return false
@@ -67,7 +49,7 @@ function validPeople(people: unknown): people is Person[] {
 
 function validReturnVisits(
 	peopleIds: number[],
-	returnVisits: unknown
+	returnVisits: unknown,
 ): returnVisits is ReturnVisit[] {
 	if (!Array.isArray(returnVisits)) return false
 
@@ -98,7 +80,7 @@ function validReturnVisits(
 
 async function importData(event: Event) {
 	const sure = confirm(
-		"¿Segura que deseas importar estos datos?\nEsto sobreescribirá los datos actuales."
+		"¿Segura que deseas importar estos datos?\nEsto sobreescribirá los datos actuales.",
 	)
 
 	if (!sure) return
@@ -112,7 +94,7 @@ async function importData(event: Event) {
 	try {
 		const file = files[0]
 		const data: { people: unknown; returnVisits: unknown } = JSON.parse(
-			await file.text()
+			await file.text(),
 		)
 
 		if (!validPeople(data?.people)) {
@@ -136,9 +118,9 @@ async function importData(event: Event) {
 							latitude: person.location.latitude,
 							longitude: person.location.longitude,
 							altitude: person.location.altitude,
-					  }
+						}
 					: undefined,
-			}))
+			})),
 		)
 
 		await importReturnVisits.mutateAsync(
@@ -148,7 +130,7 @@ async function importData(event: Event) {
 				topic: returnVisit.topic,
 				returnDate: new Date(returnVisit.returnDate),
 				notes: returnVisit.notes,
-			}))
+			})),
 		)
 
 		router.back()
@@ -159,29 +141,21 @@ async function importData(event: Event) {
 </script>
 
 <template>
-	<main class="max-w-prose mx-auto py-2 px-3">
-		<div class="flex gap-3 justify-center">
-			<VButton color="asparagus" :href="url" :download="fileName" external>
-				Exportar datos
-			</VButton>
+	<input
+		ref="fileInput"
+		class="hidden"
+		@change="importData"
+		type="file"
+		accept=".return-visits,application/json"
+	/>
 
-			<input
-				ref="fileInput"
-				class="hidden"
-				@change="importData"
-				type="file"
-				accept=".return-visits,application/json"
-			/>
-
-			<VButton
-				:loading="
-					importReturnVisits.isPending.value || importPeople.isPending.value
-				"
-				color="lemon"
-				@click="fileInput?.click()"
-			>
-				Importar datos
-			</VButton>
-		</div>
-	</main>
+	<VButton
+		:loading="
+			importReturnVisits.isPending.value || importPeople.isPending.value
+		"
+		:color="color"
+		@click="fileInput?.click()"
+	>
+		<slot />
+	</VButton>
 </template>

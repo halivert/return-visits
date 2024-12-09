@@ -2,7 +2,7 @@
 import { computed } from "vue"
 import { RouterLink, RouterLinkProps } from "vue-router"
 
-type Color = "asparagus" | "lemon" | "fawn" | "chili" | "rangoon"
+export type Color = "asparagus" | "lemon" | "fawn" | "chili" | "rangoon"
 
 const props = withDefaults(
 	defineProps<{

@@ -75,7 +75,7 @@ export const router = createRouter({
 		{
 			path: "/config",
 			name: "Config",
-			component: () => import("@/pages/AppConfig.vue"),
+			component: () => import("@/config/pages/AppConfig.vue"),
 		},
 		{ path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
 	],
