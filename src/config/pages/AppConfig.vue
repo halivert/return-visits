@@ -44,7 +44,7 @@ import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
 						href="https://github.com/halivert/return-visits"
 						target="_blank"
 						rel="noopener noreferrer"
-						>Codigo fuente
+						>Código fuente
 						<span class="text-[#010409]">
 							<svg
 								class="size-4 inline-block"
@@ -65,7 +65,7 @@ import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
 
 		<details class="text-sm">
 			<summary class="text-base font-semibold">
-				Licencias de codigo abierto
+				Licencias de código abierto
 			</summary>
 
 			<section
