@@ -45,7 +45,7 @@ import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
 						target="_blank"
 						rel="noopener noreferrer"
 						>Código fuente
-						<span class="text-[#010409]">
+						<span class="text-[#010409] dark:text-white">
 							<svg
 								class="size-4 inline-block"
 								xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@ import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
 			</summary>
 
 			<section
-				class="h-80 overscroll-contain overflow-y-scroll mx-auto bg-lemon-100 p-2"
+				class="h-80 overscroll-contain overflow-y-scroll mx-auto bg-lemon-100 p-2 dark:bg-lemon-950"
 			>
 				<OpenSourceLicenses />
 			</section>

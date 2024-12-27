@@ -45,6 +45,7 @@ const props = defineProps<{
 const id = computed(() => props.id)
 
 const personQuery = usePerson({ id })
+const locationLoading = ref(false)
 const person = computed(() => personQuery.data.value)
 const updatePersonMutation = useUpdatePerson({ id })
 const deletePerson = useDeletePerson({ id })
@@ -90,8 +91,6 @@ async function updateLocation(coords?: Person["location"]) {
 	try {
 		personForm.location = coords
 
-		console.info(personForm)
-
 		await updatePersonMutation.mutateAsync(personForm)
 
 		locationRecentlyUpdated.value = true
@@ -104,11 +103,14 @@ async function updateLocation(coords?: Person["location"]) {
 }
 
 function updatePersonLocation() {
+	personForm.errors.location = ""
+	locationLoading.value = true
 	geolocation.resume()
 
 	watch(
 		[geolocation.coords, geolocation.error],
 		([coords, error]) => {
+			locationLoading.value = false
 			if (error) {
 				personForm.errors.location =
 					"Error actualizando la ubicación.\nRevisa que la aplicación tenga los permisos necesarios."
@@ -116,11 +118,9 @@ function updatePersonLocation() {
 				return
 			}
 
-			personForm.errors.location = ""
-
 			updateLocation(coords)
 		},
-		{ once: true }
+		{ once: true },
 	)
 }
 
@@ -185,13 +185,15 @@ async function handleDeletePerson() {
 							:class="[
 								'flex-1',
 								personForm.errors.location
-									? 'bg-chili-600 text-chili-50'
-									: 'bg-lemon-500',
+									? 'bg-chili-600 text-chili-50 dark:bg-chili-700'
+									: 'bg-lemon-500 dark:bg-lemon-600',
 							]"
 							type="button"
 							@click="updatePersonLocation"
-							:disabled="
-								updatePersonMutation.isPending.value || locationRecentlyUpdated
+							:loading="
+								locationLoading ||
+								updatePersonMutation.isPending.value ||
+								locationRecentlyUpdated
 							"
 						>
 							<template v-if="locationRecentlyUpdated">
@@ -207,7 +209,9 @@ async function handleDeletePerson() {
 							type="button"
 							@click="removePersonLocation"
 							:disabled="
-								updatePersonMutation.isPending.value || locationRecentlyUpdated
+								locationLoading ||
+								updatePersonMutation.isPending.value ||
+								locationRecentlyUpdated
 							"
 						>
 							Eliminar ubicación

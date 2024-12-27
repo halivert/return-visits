@@ -8,7 +8,7 @@ import PeopleList from "@/people/components/PeopleList.vue"
 			<div class="text-right">
 				<RouterLink
 					:to="{ name: 'PeopleCreate' }"
-					class="underline bg-lemon-100"
+					class="underline bg-lemon-100 dark:bg-lemon-900"
 				>
 					Agregar persona
 				</RouterLink>

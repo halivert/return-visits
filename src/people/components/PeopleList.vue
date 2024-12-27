@@ -148,11 +148,11 @@ function resetForm() {
 			<article
 				v-for="person in people"
 				:key="person.id"
-				class="bg-asparagus-100 rounded p-2 flex flex-col"
+				class="bg-asparagus-100 rounded p-2 flex flex-col dark:bg-asparagus-900"
 			>
 				<h2 class="text-lg font-bold">
 					<RouterLink
-						class="underline hover:text-asparagus-700 focus:text-asparagus-700"
+						class="underline hover:text-asparagus-700 dark:hover:text-asparagus-400 dark:focus:text-asparagus-400 focus:text-asparagus-700"
 						:to="`/people/${person.id}`"
 					>
 						{{ person.name || "Sin nombre" }}
