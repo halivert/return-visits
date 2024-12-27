@@ -29,11 +29,11 @@ function getUrlDate(date: Date) {
 		<article
 			v-for="returnVisit in returnVisits"
 			:key="`${returnVisit.personId}-${returnVisit.date.toISOString()}`"
-			class="border p-2 bg-asparagus-200 rounded"
+			class="border p-2 bg-asparagus-100 rounded dark:bg-asparagus-900 dark:border-asparagus-950"
 		>
 			<h2 class="text-xl font-semibold">
 				<RouterLink
-					class="text-asparagus-800 underline"
+					class="underline dark:hover:text-asparagus-400 dark:focus:text-asparagus-400 "
 					:to="{
 						name: 'PeopleReturnVisitsEdit',
 						params: {

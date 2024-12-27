@@ -21,7 +21,8 @@ const showFilters = computed(() => {
 const returnVisitsQueries = useQueries({
 	queries: computed(
 		() =>
-			peopleQuery.data.value?.map(({ id }) => personReturnVisitsQuery(id)) ?? []
+			peopleQuery.data.value?.map(({ id }) => personReturnVisitsQuery(id)) ??
+			[],
 	),
 })
 
@@ -30,8 +31,8 @@ const days = computed(
 		new Set(
 			returnVisitsQueries.value
 				.flatMap(({ data }) => data?.at(0)?.returnDate.getDay())
-				.filter((day) => day != undefined)
-		)
+				.filter((day) => day != undefined),
+		),
 )
 
 const returnDays = computed<Record<number, number | undefined>>(() =>
@@ -41,30 +42,29 @@ const returnDays = computed<Record<number, number | undefined>>(() =>
 			.map(({ data }) => [
 				data?.at(0)?.personId,
 				data?.at(0)?.returnDate.getDay(),
-			])
-	)
+			]),
+	),
 )
 
 const colonies = computed(
-	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony))
+	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony)),
 )
 
-const people = computed(
-	() =>
-		peopleQuery.data.value?.filter((person) => {
-			if (selectedDays.value.length) {
-				const returnDay = returnDays.value[person.id]
+const people = computed(() =>
+	peopleQuery.data.value?.filter((person) => {
+		if (selectedDays.value.length) {
+			const returnDay = returnDays.value[person.id]
 
-				if (returnDay != undefined && !selectedDays.value.includes(returnDay))
-					return false
-			}
+			if (returnDay != undefined && !selectedDays.value.includes(returnDay))
+				return false
+		}
 
-			if (selectedColonies.value.length) {
-				if (!selectedColonies.value.includes(person.colony)) return false
-			}
+		if (selectedColonies.value.length) {
+			if (!selectedColonies.value.includes(person.colony)) return false
+		}
 
-			return true
-		})
+		return true
+	}),
 )
 
 function resetForm() {
@@ -125,11 +125,11 @@ function resetForm() {
 			<article
 				v-for="person in people"
 				:key="person.id"
-				class="bg-asparagus-100 rounded p-2 flex flex-col"
+				class="bg-asparagus-100 rounded p-2 flex flex-col dark:bg-asparagus-900"
 			>
 				<h2 class="text-lg font-bold">
 					<RouterLink
-						class="underline hover:text-asparagus-700 focus:text-asparagus-700"
+						class="underline hover:text-asparagus-700 dark:hover:text-asparagus-400 dark:focus:text-asparagus-400 focus:text-asparagus-700"
 						:to="`/people/${person.id}`"
 					>
 						{{ person.name || "Sin nombre" }}
