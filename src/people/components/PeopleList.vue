@@ -6,6 +6,7 @@ import { DAYS } from "@/constants"
 import { personReturnVisitsQuery } from "@/return-visits/queries/personReturnVisitsQuery"
 import VSelect from "@/components/form/VSelect.vue"
 import VButton from "@/components/VButton.vue"
+import { type ReturnVisit } from "@/return-visits/models/ReturnVisit"
 
 const peopleQuery = usePeopleQuery()
 
@@ -21,39 +22,47 @@ const showFilters = computed(() => {
 const returnVisitsQueries = useQueries({
 	queries: computed(
 		() =>
-			peopleQuery.data.value?.map(({ id }) => personReturnVisitsQuery(id)) ?? []
+			peopleQuery.data.value?.map(({ id }) =>
+				personReturnVisitsQuery(id, {
+					select: (returnVisits) => returnVisits.slice(0, 1),
+				}),
+			) ?? [],
 	),
 })
+
+const lastReturnVisits = computed(
+	(): Record<number, ReturnVisit> =>
+		Object.fromEntries(
+			returnVisitsQueries.value
+				.filter((returnVisits) => returnVisits.isSuccess)
+				.map((returnVisits) => returnVisits.data.at(0))
+				.filter((returnVisit): returnVisit is ReturnVisit =>
+					Boolean(returnVisit),
+				)
+				.map((returnVisit) => [returnVisit.personId, returnVisit]),
+		),
+)
 
 const days = computed(
 	() =>
 		new Set(
-			returnVisitsQueries.value
-				.flatMap(({ data }) => data?.at(0)?.returnDate.getDay())
-				.filter((day) => day != undefined)
-		)
-)
-
-const returnDays = computed<Record<number, number | undefined>>(() =>
-	Object.fromEntries(
-		returnVisitsQueries.value
-			.filter(({ data }) => !!data?.at(0)?.personId)
-			.map(({ data }) => [
-				data?.at(0)?.personId,
-				data?.at(0)?.returnDate.getDay(),
-			])
-	)
+			Object.values(lastReturnVisits.value)
+				.filter((returnVisit) => returnVisit?.returnDate)
+				.map(({ returnDate }) => returnDate.getDay()),
+		),
 )
 
 const colonies = computed(
-	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony))
+	() => new Set(peopleQuery.data.value?.map(({ colony }) => colony)),
 )
 
-const people = computed(
-	() =>
-		peopleQuery.data.value?.filter((person) => {
+const people = computed(() =>
+	peopleQuery.data.value
+		?.filter((person) => {
 			if (selectedDays.value.length) {
-				const returnDay = returnDays.value[person.id]
+				if (!lastReturnVisits.value[person.id]) return false
+
+				const returnDay = lastReturnVisits.value[person.id].returnDate.getDay()
 
 				if (returnDay != undefined && !selectedDays.value.includes(returnDay))
 					return false
@@ -65,6 +74,20 @@ const people = computed(
 
 			return true
 		})
+		.toSorted((a, b) => {
+			const returnVisitA = a ? lastReturnVisits.value[a.id] : null
+			const returnVisitB = b ? lastReturnVisits.value[b.id] : null
+
+			if (returnVisitA && returnVisitB)
+				return (
+					returnVisitB.returnDate.getTime() - returnVisitA.returnDate.getTime()
+				)
+
+			if (returnVisitA) return -1
+			if (returnVisitB) return 1
+
+			return 0
+		}),
 )
 
 function resetForm() {
@@ -138,8 +161,10 @@ function resetForm() {
 
 				<h3>{{ person.colony }}</h3>
 
-				<small v-if="returnDays[person.id] !== undefined">
-					Volver el {{ DAYS[returnDays[person.id] as number] }}
+				<small
+					v-if="lastReturnVisits[person.id]?.returnDate.getDay() !== undefined"
+				>
+					Volver el {{ DAYS[lastReturnVisits[person.id].returnDate.getDay()] }}
 				</small>
 
 				<p class="mt-5 whitespace-pre-line">{{ person.description }}</p>
