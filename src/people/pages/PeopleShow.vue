@@ -78,7 +78,7 @@ useTitle(
 						:href="locationLink"
 						rel="noopener noreferrer"
 						target="_blank"
-						class="text-base bg-lemon-100"
+						class="text-base bg-lemon-100 dark:bg-lemon-900"
 					>
 						(Ubicación)
 					</a>
@@ -94,7 +94,7 @@ useTitle(
 			<div class="text-right">
 				<RouterLink
 					:to="{ name: 'PeopleEdit', params: { id } }"
-					class="underline bg-lemon-100"
+					class="underline bg-lemon-100 dark:bg-lemon-900"
 				>
 					Editar persona
 				</RouterLink>
@@ -103,12 +103,12 @@ useTitle(
 			<hr class="h-0.5 bg-asparagus-600 my-3" />
 
 			<section class="px-2 py-1">
-				<div class="flex justify-between">
+				<div class="flex justify-between items-center">
 					<h2 class="text-xl font-semibold">Revisitas</h2>
 
 					<RouterLink
 						:to="{ name: 'PeopleReturnVisitsCreate' }"
-						class="underline bg-lemon-100"
+						class="underline bg-lemon-100 dark:bg-lemon-900"
 						active-class="hidden"
 					>
 						Agregar revisita

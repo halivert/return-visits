@@ -7,7 +7,7 @@ const route = useRoute()
 <template>
 	<nav class="max-w-prose mx-auto py-2 px-3 flex items-center flex-wrap">
 		<RouterLink
-			class="flex-grow inline-flex gap-3 items-center hover:underline hover:text-asparagus-700 focus:text-asparagus-700"
+			class="flex-grow inline-flex gap-3 items-center hover:underline hover:text-asparagus-700 focus:text-asparagus-700 dark:hover:text-asparagus-400 dark:focus:text-asparagus-400"
 			:to="{ name: 'Home' }"
 		>
 			<span class="text-3xl font-display">Revisitas</span>
@@ -21,7 +21,7 @@ const route = useRoute()
 
 		<RouterLink
 			v-show="route.name === 'Home'"
-			class="flex-grow inline-flex gap-1 items-center hover:underline hover:text-asparagus-700 focus:text-asparagus-700 justify-end"
+			class="flex-grow inline-flex gap-1 items-center hover:underline hover:text-asparagus-700 focus:text-asparagus-700 justify-end dark:hover:text-asparagus-400 dark:focus:text-asparagus-400"
 			:to="{ name: 'Config' }"
 		>
 			<span class="hidden sm:inline-block"> Configuración </span>
