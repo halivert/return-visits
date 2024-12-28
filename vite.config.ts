@@ -31,7 +31,6 @@ export default defineConfig({
 				name: "Revisitas",
 				short_name: "Revisitas",
 				description: "Lleva un registro de tus revisitas localmente",
-				background_color: "light-dark(#7FB069, #426233)",
 				theme_color: "#7FB069",
 			},
 
