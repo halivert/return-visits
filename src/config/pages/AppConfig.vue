@@ -13,6 +13,12 @@ import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
 		</section>
 
 		<section>
+			<h2 class="text-lg font-semibold underline">
+				<RouterLink :to="{ name: 'Terms' }">Términos y condiciones</RouterLink>
+			</h2>
+		</section>
+
+		<section>
 			<h2 class="text-lg font-semibold">Contacto</h2>
 			<ul class="list-disc list-inside" role="list">
 				<li>
