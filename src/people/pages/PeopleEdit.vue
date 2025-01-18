@@ -221,7 +221,9 @@ async function handleDeletePerson() {
 					<VInputErrors :errors="personForm.errors.location" />
 				</div>
 
-				<label class="text-right" for="description">Descripción</label>
+				<label class="text-right" for="description">
+					Dirección y descripción
+				</label>
 
 				<VTextarea
 					id="description"

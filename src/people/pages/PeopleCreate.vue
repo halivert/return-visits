@@ -36,7 +36,7 @@ const addPersonForm = useForm({
 	time: getTimeForInput(now),
 	topic: "",
 	returnDate: getDateForInput(
-		new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7)
+		new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
 	),
 	returnTime: getTimeForInput(now),
 	notes: "",
@@ -57,14 +57,14 @@ async function addPerson(coords?: Omit<GeolocationCoordinates, "toJSON">) {
 							longitude: coords.longitude,
 							latitude: coords.latitude,
 							altitude: coords.altitude,
-					  }
+						}
 					: undefined,
 			},
 			returnVisit: {
 				date: new Date(addPersonForm.date + "T" + addPersonForm.time),
 				topic: addPersonForm.topic,
 				returnDate: new Date(
-					addPersonForm.returnDate + "T" + addPersonForm.returnTime
+					addPersonForm.returnDate + "T" + addPersonForm.returnTime,
 				),
 				notes: addPersonForm.notes,
 			},
@@ -110,7 +110,7 @@ function handleSubmit() {
 
 	const date = new Date(addPersonForm.date + "T" + addPersonForm.time)
 	const returnDate = new Date(
-		addPersonForm.returnDate + "T" + addPersonForm.returnTime
+		addPersonForm.returnDate + "T" + addPersonForm.returnTime,
 	)
 
 	if (date.getTime() > returnDate.getTime()) {
@@ -132,7 +132,7 @@ function handleSubmit() {
 
 				addPerson(coords)
 			},
-			{ once: true }
+			{ once: true },
 		)
 
 		return
@@ -180,7 +180,9 @@ function handleSubmit() {
 				v-model:errors="addPersonForm.errors.location"
 			/>
 
-			<label class="text-right" for="description">Descripción</label>
+			<label class="text-right" for="description">
+				Dirección y descripción
+			</label>
 
 			<VTextarea
 				id="description"
