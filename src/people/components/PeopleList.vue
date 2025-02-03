@@ -148,7 +148,7 @@ function resetForm() {
 			<article
 				v-for="person in people"
 				:key="person.id"
-				class="bg-asparagus-100 rounded p-2 flex flex-col dark:bg-asparagus-900"
+				class="bg-asparagus-100 rounded-sm p-2 flex flex-col dark:bg-asparagus-900"
 			>
 				<h2 class="text-lg font-bold">
 					<RouterLink

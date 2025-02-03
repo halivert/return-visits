@@ -24,7 +24,7 @@ const errors = defineModel<string>("errors")
 			:id="id"
 			:name="id"
 			:class="[
-				'block px-2 py-1 max-w-full rounded-sm border w-full dark:text-lemon-50',
+				'block px-2 py-1 max-w-full rounded-xs border w-full dark:text-lemon-50',
 				errors
 					? 'border-chili-400 accent-chili-600'
 					: 'border-asparagus-100 accent-asparagus-600',

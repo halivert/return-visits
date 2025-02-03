@@ -31,7 +31,7 @@ const isInline = computed(() => ["checkbox", "radio"].includes(props.type))
 			:id="id"
 			:type="type"
 			:class="[
-				'border rounded-sm h-8 block px-2 py-1 dark:text-lemon-50',
+				'border rounded-xs h-8 block px-2 py-1 dark:text-lemon-50',
 				{ 'w-full max-w-full': !isInline },
 				errors
 					? 'border-chili-400 accent-chili-600'

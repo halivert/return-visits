@@ -40,7 +40,7 @@ const colorClasses: Record<Color | "", string> = {
 	<component
 		:is="isLink ? (external ? 'a' : RouterLink) : 'button'"
 		:class="[
-			'button px-2 py-1 rounded',
+			'button px-2 py-1 rounded-sm',
 			colorClasses[color],
 			{ 'is-loading': loading },
 			{ disabled: disabled || loading },

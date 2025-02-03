@@ -237,7 +237,7 @@ async function handleDeletePerson() {
 				/>
 
 				<RouterLink
-					class="col-start-2 border underline border-asparagus-600 rounded px-2 py-1 text-asparagus-600 text-center"
+					class="col-start-2 border underline border-asparagus-600 rounded-sm px-2 py-1 text-asparagus-600 text-center"
 					:to="{ name: 'PeopleShow', params: { id } }"
 				>
 					Cancelar

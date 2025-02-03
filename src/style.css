@@ -1,46 +1,186 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-	line-height: 1.5;
-	font-weight: 400;
+@theme {
+  --color-asparagus-50: #f6f9f4;
+  --color-asparagus-100: #e9f3e5;
+  --color-asparagus-200: #d5e6cc;
+  --color-asparagus-300: #b2d2a3;
+  --color-asparagus-400: #7fb069;
+  --color-asparagus-500: #65984f;
+  --color-asparagus-600: #517c3d;
+  --color-asparagus-700: #426233;
+  --color-asparagus-800: #374f2c;
+  --color-asparagus-900: #2d4225;
+  --color-asparagus-950: #152310;
 
-	color-scheme: light dark;
+  --color-lemon-50: #fefde8;
+  --color-lemon-100: #fffbbd;
+  --color-lemon-200: #fff488;
+  --color-lemon-300: #ffe744;
+  --color-lemon-400: #fed411;
+  --color-lemon-500: #eebb04;
+  --color-lemon-600: #cd9001;
+  --color-lemon-700: #a46604;
+  --color-lemon-800: #87500c;
+  --color-lemon-900: #734110;
+  --color-lemon-950: #432105;
 
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  --color-fawn-50: #fdf8ef;
+  --color-fawn-100: #faeeda;
+  --color-fawn-200: #f3dbb5;
+  --color-fawn-300: #ecc285;
+  --color-fawn-400: #e6aa68;
+  --color-fawn-500: #dc8433;
+  --color-fawn-600: #ce6d28;
+  --color-fawn-700: #ab5523;
+  --color-fawn-800: #894523;
+  --color-fawn-900: #6f3a1f;
+  --color-fawn-950: #3b1b0f;
+
+  --color-chili-50: #fef4f2;
+  --color-chili-100: #fde7e3;
+  --color-chili-200: #fdd2cb;
+  --color-chili-300: #fab3a7;
+  --color-chili-400: #f58674;
+  --color-chili-500: #eb5f48;
+  --color-chili-600: #ca3c25;
+  --color-chili-700: #b6341f;
+  --color-chili-800: #962f1e;
+  --color-chili-900: #7d2c1f;
+  --color-chili-950: #44130b;
+
+  --color-rangoon-50: #fdf7e8;
+  --color-rangoon-100: #f9edce;
+  --color-rangoon-200: #f3dea3;
+  --color-rangoon-300: #e9ca6d;
+  --color-rangoon-400: #dbb740;
+  --color-rangoon-500: #c19e21;
+  --color-rangoon-600: #9a8016;
+  --color-rangoon-700: #756416;
+  --color-rangoon-800: #5d5117;
+  --color-rangoon-900: #4f4618;
+  --color-rangoon-950: #1d1a05;
 }
 
-@layer components {
-	.button.disabled {
-		@apply opacity-60 cursor-default;
-	}
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-	.button.is-loading {
-		@apply inline-flex justify-center items-center;
-		@apply pointer-events-none select-none text-transparent;
-	}
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
 
-	.button.is-loading::after,
-	.button.is-loading::before {
-		content: "";
-		@apply absolute border-2 w-4 h-4 rounded-full border-white/30;
-	}
+@utility button {
+  &.disabled {
+    @apply opacity-60 cursor-default;
+  }
 
-	.button.is-loading::before {
-		@apply border-white border-b-transparent border-l-transparent animate-spin;
-	}
+  &.is-loading {
+    @apply inline-flex justify-center items-center;
+    @apply pointer-events-none select-none text-transparent;
+  }
 
-	.button.is-loading.light::after,
-	.button.is-loading.light::before {
-		@apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
-	}
+  &.is-loading::after {
+    content: '';
+    @apply absolute border-2 w-4 h-4 rounded-full border-white/30;
+  }
 
-	.button.is-loading.light::before {
-		@apply border-gray-600 border-b-transparent border-l-transparent animate-spin;
-	}
+  &.is-loading::before {
+    content: '';
+    @apply absolute border-2 w-4 h-4 rounded-full border-white/30;
+  }
+
+  &.is-loading::before {
+    @apply border-white border-b-transparent border-l-transparent animate-spin;
+  }
+
+  &.is-loading.light::after {
+    @apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+  }
+
+  &.is-loading.light::before {
+    @apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+  }
+
+  &.is-loading.light::before {
+    @apply border-gray-600 border-b-transparent border-l-transparent animate-spin;
+  }
+}
+
+@utility disabled {
+  &.button {
+    @apply opacity-60 cursor-default;
+  }
+}
+
+@utility is-loading {
+  &.button {
+    @apply inline-flex justify-center items-center;
+    @apply pointer-events-none select-none text-transparent;
+  }
+
+  &.button::after {
+    content: '';
+    @apply absolute border-2 w-4 h-4 rounded-full border-white/30;
+  }
+
+  & .button::before {
+    content: '';
+    @apply absolute border-2 w-4 h-4 rounded-full border-white/30;
+  }
+
+  &.button::before {
+    @apply border-white border-b-transparent border-l-transparent animate-spin;
+  }
+
+  &.button.light::after {
+    @apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+  }
+
+  & .button.light::before {
+    @apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+  }
+
+  &.button.light::before {
+    @apply border-gray-600 border-b-transparent border-l-transparent animate-spin;
+  }
+}
+
+@utility light {
+  &.button.is-loading::after {
+    @apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+  }
+
+  & .button.is-loading::before {
+    @apply absolute border-2 w-4 h-4 rounded-full border-gray-800/30;
+  }
+
+  &.button.is-loading::before {
+    @apply border-gray-600 border-b-transparent border-l-transparent animate-spin;
+  }
+}
+
+@layer utilities {
+  :root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light dark;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }

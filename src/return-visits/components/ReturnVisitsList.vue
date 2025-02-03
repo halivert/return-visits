@@ -29,7 +29,7 @@ function getUrlDate(date: Date) {
 		<article
 			v-for="returnVisit in returnVisits"
 			:key="`${returnVisit.personId}-${returnVisit.date.toISOString()}`"
-			class="border p-2 bg-asparagus-100 rounded dark:bg-asparagus-900 dark:border-asparagus-950"
+			class="border p-2 bg-asparagus-100 rounded-sm dark:bg-asparagus-900 dark:border-asparagus-950"
 		>
 			<h2 class="text-xl font-semibold">
 				<RouterLink
