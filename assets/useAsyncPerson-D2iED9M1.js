@@ -1,0 +1,1 @@
+import{I as s,y as t,p as o,f as a,x as y,u as p}from"./index-BYtkt1Xv.js";function n(e,r={}){return s(()=>({...a(r),queryKey:o.detail(e),queryFn:({queryKey:u})=>t("people",u[2])}))}function c({id:e,options:r}){return y(n(e,r))}function f({id:e,options:r}){return p().ensureQueryData(n(e,r))}export{f as a,c as u};
