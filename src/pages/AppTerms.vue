@@ -5,7 +5,7 @@
 
 			<div>
 				<h2 class="text-lg font-semibold">
-					Última actualización: <i>2025-01-11</i>
+					Última actualización: <i>2026-10-16</i>
 				</h2>
 
 				<p>
@@ -25,9 +25,13 @@
 					La aplicación "Revisitas" está diseñada para ayudar a publicadores y
 					publicadoras de diferentes congregaciones a registrar y organizar
 					información sobre personas a las que desean volver a visitar. Toda la
-					información se almacena localmente en el dispositivo del usuario y
-					<strong>no se transfiere ni se almacena en servidores externos</strong
-					>.
+					información se almacena localmente en el dispositivo del usuario.
+					<strong
+						>Los datos de las personas y revisitas (nombres, ubicaciones, temas y
+						notas) nunca se envían sin cifrar ni se almacenan de forma permanente
+						en servidores externos</strong
+					>. Las únicas excepciones son las notificaciones y la transferencia
+					entre teléfonos, descritas en la sección 3.
 				</p>
 			</div>
 
@@ -57,11 +61,14 @@
 					</p>
 
 					<p>
-						2.4 <strong>Importación y exportación de datos</strong>: La
-						aplicación permite importar y exportar datos, pero estas operaciones
-						se realizan exclusivamente a nivel local. Es responsabilidad del
-						usuario realizar copias de seguridad y reestablecer los datos en el
-						mismo dispositivo u otro, según sea necesario.
+						2.4 <strong>Respaldos</strong>: La aplicación permite crear
+						respaldos cifrados con una contraseña elegida por el usuario. El
+						usuario decide dónde guardarlos o compartirlos (por ejemplo, en una
+						aplicación de mensajería o en almacenamiento en la nube). Sin la
+						contraseña no es posible leer ni restaurar un respaldo, y
+						<strong>no existe forma de recuperar una contraseña olvidada</strong
+						>. Es responsabilidad del usuario realizar respaldos con regularidad y
+						guardar su contraseña en un lugar seguro.
 					</p>
 				</div>
 			</div>
@@ -73,19 +80,46 @@
 					<p>
 						3.1 <strong>Almacenamiento local</strong>: La aplicación no realiza
 						copias de seguridad automáticas en servidores externos. Si el
-						dispositivo es dañado, perdido o robado, la información almacenada
-						podría perderse de forma irrecuperable.
+						dispositivo es dañado, perdido o robado, o si el navegador borra los
+						datos del sitio, la información que no esté en un respaldo podría
+						perderse de forma irrecuperable. La aplicación solicita al navegador
+						almacenamiento persistente para reducir este riesgo, pero el
+						navegador puede negarlo.
 					</p>
 
 					<p>
-						3.2 <strong>Eliminación de datos</strong>: Si el usuario elimina
+						3.2 <strong>Notificaciones</strong>: Si el usuario activa las
+						notificaciones, la aplicación envía a un servidor propio la
+						suscripción de notificaciones del navegador, un identificador
+						aleatorio por cada revisita futura y la hora en que debe avisarse. El
+						servidor no recibe nombres, ubicaciones, temas ni notas: el texto de
+						la notificación se genera en el dispositivo. Para entregar el aviso,
+						el servidor utiliza el servicio de notificaciones del fabricante del
+						navegador (por ejemplo, Google, Apple o Mozilla). Los avisos se
+						eliminan del servidor al enviarse, y la suscripción al desactivar las
+						notificaciones.
+					</p>
+
+					<p>
+						3.3 <strong>Transferencia entre teléfonos</strong>: Al usar
+						"Enviar a otro teléfono", todos los datos se cifran en el
+						dispositivo con una clave aleatoria que solo está en el código QR, y
+						se suben cifrados a un servidor propio, que no puede leerlos. Los
+						datos se eliminan del servidor en cuanto el otro teléfono los
+						descarga o, como máximo, 10 minutos después. Cualquier persona que
+						obtenga el código QR antes de que se use podría recibir los datos,
+						por lo que no debe compartirse.
+					</p>
+
+					<p>
+						3.4 <strong>Eliminación de datos</strong>: Si el usuario elimina
 						datos dentro de la aplicación, estos no podrán ser recuperados. Es
 						responsabilidad del usuario asegurarse de realizar copias de
 						seguridad antes de eliminar información importante.
 					</p>
 
 					<p>
-						3.3 <strong>Disponibilidad</strong>: La aplicación está disponible
+						3.5 <strong>Disponibilidad</strong>: La aplicación está disponible
 						exclusivamente en español y no está sujeta a restricciones de edad.
 						Sin embargo, se espera que los usuarios sean capaces de comprender
 						estos Términos y Condiciones antes de utilizarla.

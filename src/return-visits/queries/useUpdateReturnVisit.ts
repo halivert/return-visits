@@ -28,6 +28,7 @@ export function useUpdateReturnVisit({
 					const original = originalReturnVisit.value
 
 					const data: ReturnVisit = {
+						uuid: original.uuid,
 						personId: returnVisit.personId ?? original.personId,
 						date: returnVisit.date ?? original.date,
 						topic: (returnVisit.topic ?? original.topic).trim(),

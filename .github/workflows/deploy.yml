@@ -22,6 +22,9 @@ jobs:
           cache: "npm"
 
       - name: Build JS files
+        env:
+          VITE_PUSH_API_URL: ${{ vars.PUSH_API_URL }}
+          VITE_VAPID_PUBLIC_KEY: ${{ vars.VAPID_PUBLIC_KEY }}
         run: |
           npm i
           npm run build -- --base="/return-visits/"

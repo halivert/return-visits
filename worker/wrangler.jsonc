@@ -1,0 +1,32 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "return-visits-push",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-09-01",
+	"triggers": {
+		// Send due reminders every minute
+		"crons": ["* * * * *"]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "return-visits-push",
+			"database_id": "8f9179d4-58e9-4db7-b3e1-98c6eff7958d"
+		}
+	],
+	"ratelimits": [
+		{
+			// Transfers per IP per minute
+			"name": "TRANSFER_LIMITER",
+			"namespace_id": "1001",
+			"simple": { "limit": 5, "period": 60 }
+		}
+	],
+	"vars": {
+		// Comma separated list of origins allowed to call the API
+		"ALLOWED_ORIGINS": "https://halivert.github.io,https://localhost:5173",
+		"VAPID_SUBJECT": "https://halivert.github.io/return-visits/",
+		"VAPID_PUBLIC_KEY": "BMSF1-AjljAn7-T0QDZUR1JVne7F1_9Mln0dmB2rzfyUEtE_OhOezh61Y2Z5r40NVz_9RghFKI1nGQTJvOLfZZw"
+	}
+	// VAPID_PRIVATE_KEY is a secret: `npx wrangler secret put VAPID_PRIVATE_KEY`
+}

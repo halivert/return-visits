@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import ExportButton from "@/config/components/ExportButton.vue"
-import ImportButton from "@/config/components/ImportButton.vue"
+import BackupSection from "@/backups/components/BackupSection.vue"
+import TransferSection from "@/backups/components/TransferSection.vue"
 import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
+import NotificationSettings from "@/notifications/components/NotificationSettings.vue"
 </script>
 
 <template>
 	<main class="max-w-prose mx-auto py-2 px-3 space-y-3">
-		<section class="flex gap-3 justify-center">
-			<ExportButton>Exportar datos</ExportButton>
+		<BackupSection />
 
-			<ImportButton>Importar datos</ImportButton>
-		</section>
+		<TransferSection />
+
+		<NotificationSettings />
 
 		<section>
 			<h2 class="text-lg font-semibold underline">
