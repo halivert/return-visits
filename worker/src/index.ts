@@ -10,6 +10,7 @@ interface Env {
 	VAPID_SUBJECT: string
 	VAPID_PUBLIC_KEY: string
 	VAPID_PRIVATE_KEY: string
+	TRANSFER_LIMITER: RateLimit
 }
 
 interface Reminder {
@@ -37,6 +38,12 @@ const STALE_AFTER = HOUR_IN_MILIS
 /** Pushes sent per cron run, keeps us under the free plan subrequest limit */
 const PUSHES_PER_RUN = 40
 
+/** Time the other phone has to download a transfer */
+const TRANSFER_TTL = 10 * 60 * 1000
+
+/** D1 limit for a single value */
+const MAX_TRANSFER_BYTES = 2_000_000
+
 class HttpError extends Error {
 	constructor(
 		public status: number,
@@ -54,7 +61,7 @@ function corsHeaders(request: Request, env: Env): Record<string, string> {
 
 	return {
 		"access-control-allow-origin": origin,
-		"access-control-allow-methods": "PUT, DELETE, OPTIONS",
+		"access-control-allow-methods": "GET, HEAD, POST, PUT, DELETE, OPTIONS",
 		"access-control-allow-headers": "authorization, content-type",
 		"access-control-max-age": "86400",
 		vary: "origin",
@@ -198,21 +205,99 @@ async function deleteDevice(request: Request, env: Env, deviceId: string) {
 	return new Response(null, { status: 204 })
 }
 
+async function createTransfer(request: Request, env: Env) {
+	const ip = request.headers.get("cf-connecting-ip") ?? "unknown"
+	const { success } = await env.TRANSFER_LIMITER.limit({ key: ip })
+	if (!success) throw new HttpError(429, "Too many transfers")
+
+	const length = Number(request.headers.get("content-length"))
+	if (!length || length > MAX_TRANSFER_BYTES) {
+		throw new HttpError(413, "Invalid size")
+	}
+
+	const data = await request.arrayBuffer()
+	if (data.byteLength > MAX_TRANSFER_BYTES) {
+		throw new HttpError(413, "Invalid size")
+	}
+
+	const id = crypto.randomUUID()
+	const expiresAt = Date.now() + TRANSFER_TTL
+
+	await env.DB.prepare(
+		"INSERT INTO transfers (id, data, expires_at) VALUES (?, ?, ?)"
+	)
+		.bind(id, data, expiresAt)
+		.run()
+
+	return Response.json({ id, expiresAt }, { status: 201 })
+}
+
+/** Transfers can be downloaded only once */
+async function downloadTransfer(env: Env, id: string) {
+	const transfer = await env.DB.prepare(
+		"DELETE FROM transfers WHERE id = ? AND expires_at > ? RETURNING data"
+	)
+		.bind(id, Date.now())
+		.first<{ data: ArrayBuffer | number[] }>()
+
+	if (!transfer) throw new HttpError(404, "Transfer not found or expired")
+
+	return new Response(new Uint8Array(transfer.data), {
+		headers: {
+			"content-type": "application/octet-stream",
+			"cache-control": "no-store",
+		},
+	})
+}
+
+/** Lets the sending phone know when the transfer was picked up */
+async function transferStatus(env: Env, id: string) {
+	const transfer = await env.DB.prepare(
+		"SELECT 1 FROM transfers WHERE id = ? AND expires_at > ?"
+	)
+		.bind(id, Date.now())
+		.first()
+
+	return new Response(null, {
+		status: transfer ? 204 : 404,
+		headers: { "cache-control": "no-store" },
+	})
+}
+
+async function cancelTransfer(env: Env, id: string) {
+	await env.DB.prepare("DELETE FROM transfers WHERE id = ?").bind(id).run()
+
+	return new Response(null, { status: 204 })
+}
+
 async function route(request: Request, env: Env): Promise<Response> {
 	const { pathname } = new URL(request.url)
-	const deviceId = pathname.match(/^\/devices\/([^/]+)$/)?.[1]
+	const [, resource, rawId, ...rest] = pathname.split("/")
+	const id = rawId?.toLowerCase()
 
-	if (!deviceId || !UUID_REGEX.test(deviceId)) {
+	if (resource === "transfers" && !id && request.method === "POST") {
+		return createTransfer(request, env)
+	}
+
+	if (!id || !UUID_REGEX.test(id) || rest.length) {
 		throw new HttpError(404, "Not found")
 	}
 
-	switch (request.method) {
-		case "PUT":
-			return putDevice(request, env, deviceId.toLowerCase())
-		case "DELETE":
-			return deleteDevice(request, env, deviceId.toLowerCase())
+	const handler = `${request.method} ${resource}`
+
+	switch (handler) {
+		case "PUT devices":
+			return putDevice(request, env, id)
+		case "DELETE devices":
+			return deleteDevice(request, env, id)
+		case "GET transfers":
+			return downloadTransfer(env, id)
+		case "HEAD transfers":
+			return transferStatus(env, id)
+		case "DELETE transfers":
+			return cancelTransfer(env, id)
 		default:
-			throw new HttpError(405, "Method not allowed")
+			throw new HttpError(404, "Not found")
 	}
 }
 
@@ -333,6 +418,10 @@ export default {
 	},
 
 	async scheduled(_controller, env) {
+		await env.DB.prepare("DELETE FROM transfers WHERE expires_at <= ?")
+			.bind(Date.now())
+			.run()
+
 		await sendDueReminders(env)
 	},
 } satisfies ExportedHandler<Env>

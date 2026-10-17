@@ -7,6 +7,7 @@ export function useImportReturnVisits() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
+		meta: { restore: true },
 		mutationFn: async (
 			returnVisits: ReturnVisit[]
 		): Promise<[number, Date][]> => {

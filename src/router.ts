@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router"
 import AppHome from "@/pages/AppHome.vue"
 import NotFound from "@/pages/NotFound.vue"
+import { hasTransferCode } from "@/backups/transfer"
 
 const appName = "Revisitas"
 
@@ -78,6 +79,14 @@ export const router = createRouter({
 			component: () => import("@/config/pages/AppConfig.vue"),
 		},
 		{
+			path: "/transfer",
+			name: "Transfer",
+			component: () => import("@/backups/pages/TransferReceive.vue"),
+			meta: {
+				title: `Recibir datos | ${appName}`,
+			},
+		},
+		{
 			path: "/terms",
 			name: "Terms",
 			component: () => import("@/pages/AppTerms.vue"),
@@ -87,6 +96,12 @@ export const router = createRouter({
 })
 
 router.beforeEach((to) => {
+	// Transfer links point to the base url, it exists even without the app
+	// installed
+	if (to.name === "Home" && hasTransferCode(to.hash)) {
+		return { name: "Transfer", hash: to.hash }
+	}
+
 	document.title = typeof to.meta.title === "string" ? to.meta.title : appName
 	to.meta.appName = appName
 })

@@ -7,6 +7,7 @@ export function useImportPeople() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
+		meta: { restore: true },
 		mutationFn: async (people: Person[]): Promise<number[]> => {
 			await clearStore("people")
 

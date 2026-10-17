@@ -17,3 +17,14 @@ CREATE TABLE IF NOT EXISTS reminders (
 );
 
 CREATE INDEX IF NOT EXISTS reminders_send_at ON reminders (send_at);
+
+-- Encrypted data waiting to be picked up by another phone. The key is only in
+-- the QR code, so this is unreadable here. Rows are deleted on download or
+-- after they expire.
+CREATE TABLE IF NOT EXISTS transfers (
+	id TEXT PRIMARY KEY,
+	data BLOB NOT NULL,
+	expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS transfers_expires_at ON transfers (expires_at);

@@ -1,4 +1,5 @@
 import { getAllFromStore } from "@/db/useDatabase"
+import { base64UrlToBytes, bytesToBase64Url } from "@/base64"
 import { MINUTE_IN_MILIS } from "@/constants"
 import {
 	Device,
@@ -8,20 +9,8 @@ import {
 	vapidPublicKey,
 } from "@/notifications/notificationSettings"
 
-function base64UrlToBytes(value: string): Uint8Array {
-	const base64 = value.replace(/-/g, "+").replace(/_/g, "/")
-	const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="))
-
-	return Uint8Array.from(binary, (char) => char.charCodeAt(0))
-}
-
 function randomToken(): string {
-	const bytes = crypto.getRandomValues(new Uint8Array(32))
-
-	return btoa(String.fromCharCode(...bytes))
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=+$/, "")
+	return bytesToBase64Url(crypto.getRandomValues(new Uint8Array(32)))
 }
 
 async function deviceRequest(device: Device, method: string, body?: unknown) {
