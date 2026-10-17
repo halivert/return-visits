@@ -125,6 +125,11 @@ async function importData(event: Event) {
 
 		await importReturnVisits.mutateAsync(
 			data.returnVisits.map((returnVisit) => ({
+				// Backups made before notifications don't have uuid
+				uuid:
+					typeof returnVisit.uuid === "string" && returnVisit.uuid
+						? returnVisit.uuid
+						: crypto.randomUUID(),
 				personId: returnVisit.personId,
 				date: new Date(returnVisit.date),
 				topic: returnVisit.topic,

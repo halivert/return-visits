@@ -15,9 +15,10 @@ export function useAddReturnVisit({ personId }: UseAddReturnVisitParams) {
 		mutationFn: computed(
 			() =>
 				async (
-					returnVisit: Omit<ReturnVisit, "personId">
+					returnVisit: Omit<ReturnVisit, "personId" | "uuid">
 				): Promise<ReturnVisit> => {
 					const newReturnVisit: ReturnVisit = {
+						uuid: crypto.randomUUID(),
 						personId: unref(personId),
 						date: returnVisit.date,
 						returnDate: returnVisit.returnDate,

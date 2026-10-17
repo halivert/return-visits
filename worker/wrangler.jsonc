@@ -1,0 +1,25 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "return-visits-push",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-09-01",
+	"triggers": {
+		// Send due reminders every minute
+		"crons": ["* * * * *"]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "return-visits-push",
+			// Replace with the id printed by `npx wrangler d1 create return-visits-push`
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	],
+	"vars": {
+		// Comma separated list of origins allowed to call the API
+		"ALLOWED_ORIGINS": "https://halivert.github.io,https://localhost:5173",
+		"VAPID_SUBJECT": "mailto:you@example.com",
+		"VAPID_PUBLIC_KEY": ""
+	}
+	// VAPID_PRIVATE_KEY is a secret: `npx wrangler secret put VAPID_PRIVATE_KEY`
+}

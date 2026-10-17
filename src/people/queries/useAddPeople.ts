@@ -14,7 +14,7 @@ export function useAddPeople() {
 			returnVisit,
 		}: {
 			person: Omit<Person, "id">
-			returnVisit?: Omit<ReturnVisit, "personId">
+			returnVisit?: Omit<ReturnVisit, "personId" | "uuid">
 		}): Promise<{ person: Person; returnVisit?: ReturnVisit }> => {
 			const newPerson: Omit<Person, "id"> = {
 				colony: person.colony.trim(),
@@ -28,6 +28,7 @@ export function useAddPeople() {
 			const newReturnVisit: ReturnVisit | undefined =
 				returnVisit && newPersonId != undefined
 					? {
+							uuid: crypto.randomUUID(),
 							personId: newPersonId,
 							date: returnVisit.date,
 							topic: returnVisit.topic.trim(),

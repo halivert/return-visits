@@ -34,6 +34,7 @@ const stores = defineStores({
 			date: ["date"],
 			returnDate: ["returnDate"],
 			topic: ["topic"],
+			uuid: ["uuid", { unique: true }],
 		},
 	},
 })
@@ -44,21 +45,46 @@ type Store = keyof Stores
 export function getDatabase(): Promise<IDBDatabase> {
 	return new Promise((resolve, reject) => {
 		const dbName = "return_visits"
-		const currentVersion = 1
+		const currentVersion = 2
 
 		const request = indexedDB.open(dbName, currentVersion)
 
 		request.onupgradeneeded = (event) => {
-			// @ts-expect-error result should be in event.target
-			const db: IDBDatabase = event.target.result
+			const db = request.result
+			const transaction = request.transaction!
 
 			Object.entries(stores).forEach(([storeName, options]) => {
-				const store = db.createObjectStore(storeName, options.options)
+				const store = db.objectStoreNames.contains(storeName)
+					? transaction.objectStore(storeName)
+					: db.createObjectStore(storeName, options.options)
 
-				Object.entries(options.indexes).forEach(([indexName, options]) => {
+				const indexes: BaseStores[string]["indexes"] = options.indexes
+
+				Object.entries(indexes).forEach(([indexName, options]) => {
+					if (store.indexNames.contains(indexName)) return
+
 					store.createIndex(indexName, ...options)
 				})
 			})
+
+			/**
+			 * Version 2 adds an uuid to return visits, used to reference them in push
+			 * notifications
+			 */
+			if (event.oldVersion > 0 && event.oldVersion < 2) {
+				const cursorRequest = transaction.objectStore(RETURN_VISITS_STORE).openCursor()
+
+				cursorRequest.onsuccess = () => {
+					const cursor = cursorRequest.result
+					if (!cursor) return
+
+					if (!cursor.value.uuid) {
+						cursor.update({ ...cursor.value, uuid: crypto.randomUUID() })
+					}
+
+					cursor.continue()
+				}
+			}
 		}
 
 		request.onsuccess = (event) => {

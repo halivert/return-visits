@@ -2,6 +2,7 @@
 import ExportButton from "@/config/components/ExportButton.vue"
 import ImportButton from "@/config/components/ImportButton.vue"
 import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
+import NotificationSettings from "@/notifications/components/NotificationSettings.vue"
 </script>
 
 <template>
@@ -11,6 +12,8 @@ import OpenSourceLicenses from "@/config/components/OpenSourceLicenses.vue"
 
 			<ImportButton>Importar datos</ImportButton>
 		</section>
+
+		<NotificationSettings />
 
 		<section>
 			<h2 class="text-lg font-semibold underline">
