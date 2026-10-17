@@ -4,7 +4,6 @@ import { useRoute, useRouter } from "vue-router"
 import QrScanner from "qr-scanner"
 import VButton from "@/components/VButton.vue"
 import { useRestoreBackup } from "@/backups/backupData"
-import { markBackedUp } from "@/backups/backupStatus"
 import {
 	downloadTransfer,
 	parseTransferCode,
@@ -64,7 +63,6 @@ async function receive() {
 
 	try {
 		await restore(await downloadTransfer(code.value))
-		markBackedUp()
 		status.value = "done"
 	} catch (e) {
 		error.value = e instanceof Error ? e.message : "Error al recibir los datos"
